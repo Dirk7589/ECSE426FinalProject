@@ -21,9 +21,10 @@
 #include "wireless.h"
 #include "spi.h"
 #include "lcd.h"
+#include "keypad.h"
 
 /*Defines */
-#define DEBUG 1
+#define DEBUG 0
 #define TRANSMIT_WIRELESS 0
 #define USER_BTN 0x0001 /*!<Defines the bit location of the user button*/
 #define THRESHOLD_ANGLE 10
@@ -140,24 +141,30 @@ int main (void) {
 	//Create mutex
 	dmaId = osMutexCreate(osMutex(dmaMutex));
 	
-	//initIO(); //Enable LEDs and button
+	initIO(); //Enable LEDs and button
 	initTim3(); //Enable Tim3 at 100Hz
 	initACC(); //Enable the accelerometer
 	initDMA(); //Enable DMA for the accelerometer
 	initEXTIButton(); //Enable button interrupts via exti1
 	initSPI(); //Enable SPI for wireless
 	initWireless(); //Configure the wireless module
-	lcd_init(MODE_8_BIT); 
+	//lcd_init(MODE_8_BIT); 
+	//keypadInit();
 	wirelessRead(rxWirelessInit,0x00,WIRELESS_BUFFER_INIT_SIZE);
 	
 	#if DEBUG
-		lcd_puts("I'm a stupid LCD, no... really...");
-		osDelay(2000);
-		lcd_goto(40);
-		lcd_puts("Secretly, I'm a");
-		osDelay(2000);
-		lcd_clear();
-		while(1);
+// 		lcd_puts("I'm a stupid LCD, no... really...");
+// 		osDelay(2000);
+// 		lcd_goto(40);
+// 		lcd_puts("Secretly, I'm a");
+// 		osDelay(2000);
+// 		lcd_clear();
+// 		while(1);
+		char key = 'e';
+		while(1){
+			key = keypadRead();
+			lcd_write(key);
+		}
 			
 		
 	#endif
