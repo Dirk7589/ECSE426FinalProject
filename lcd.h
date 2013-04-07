@@ -10,8 +10,8 @@
 #define __LCD_H
 
 /*Hardware Defines*/
-#define GPIO_PORT GPIOD /**<Defines the GPIO port*/
-#define GPIO_CLOCK	RCC_AHB1Periph_GPIOD /**<Defines the GPIO peripheral clock*/
+#define GPIO_PORT_LCD GPIOD /**<Defines the GPIO port*/
+#define GPIO_CLOCK_LCD	RCC_AHB1Periph_GPIOD /**<Defines the GPIO peripheral clock*/
 #define LCD_RS GPIO_Pin_10/**<The RS pin*/
 #define LCD_RW GPIO_Pin_9/**<The RW pin*/
 #define LCD_EN GPIO_Pin_8 /**<The EN pin*/

@@ -22,9 +22,9 @@ static uint8_t mode;
 void lcd_write(char c){
 	
 	if(mode == MODE_8_BIT){
-		GPIO_PORT->BSRRL = LCD_RS; //Set RS high
-		GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-		GPIO_PORT->ODR = GPIO_PORT->ODR + c; //Load the char into the lower half of PORTD
+		GPIO_PORT_LCD->BSRRL = LCD_RS; //Set RS high
+		GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+		GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + c; //Load the char into the lower half of PORTD
 		lcd_strobe(); //Strobe
 	}
 	
@@ -39,10 +39,10 @@ void lcd_write(char c){
 *@retval None
 */
 void lcd_clear(void){
-	GPIO_PORT->BSRRH = LCD_RS;	//set RS low
+	GPIO_PORT_LCD->BSRRH = LCD_RS;	//set RS low
 	
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + LCD_CLEAR_CMD;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + LCD_CLEAR_CMD;
 	lcd_strobe();	//write the clear command
 }
 
@@ -65,11 +65,11 @@ void lcd_puts(const char * s){
 *@retval None
 */
 void lcd_goto(unsigned char pos){
-	GPIO_PORT->BSRRH = LCD_RS;	//set RS low
+	GPIO_PORT_LCD->BSRRH = LCD_RS;	//set RS low
 	
 	pos = pos + 0x80;
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + pos;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + pos;
 	lcd_strobe();	//write the clear command
 }
 
@@ -81,7 +81,7 @@ void lcd_goto(unsigned char pos){
 */
 void lcd_init(uint16_t m){
 	mode = m;
-	RCC_AHB1PeriphClockCmd(GPIO_CLOCK, ENABLE); //Setup the peripheral clock
+	RCC_AHB1PeriphClockCmd(GPIO_CLOCK_LCD, ENABLE); //Setup the peripheral clock
 	
 	osDelay(50);
 	
@@ -94,35 +94,35 @@ void lcd_init(uint16_t m){
 	gpio_init_lcd.GPIO_OType = GPIO_OType_PP; //Push Pull config
 	gpio_init_lcd.GPIO_PuPd = GPIO_PuPd_NOPULL; //Turn off pull ups 
 	
-	GPIO_Init(GPIO_PORT, &gpio_init_lcd); //Intialize port
+	GPIO_Init(GPIO_PORT_LCD, &gpio_init_lcd); //Intialize port
 	
-	GPIO_PORT->ODR = 0x30; 
-	GPIO_PORT->BSRRH = LCD_RS; //Place in write mode
-	GPIO_PORT->BSRRH = LCD_RW; //Place in write mode
+	GPIO_PORT_LCD->ODR = 0x30; 
+	GPIO_PORT_LCD->BSRRH = LCD_RS; //Place in write mode
+	GPIO_PORT_LCD->BSRRH = LCD_RW; //Place in write mode
 	
 	lcd_strobe(); //Strobe EN line to latch in values
 	osDelay(5); //Delay for settling
 	
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + LCD_CURSOR_ON;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + LCD_CURSOR_ON;
 	lcd_strobe();
 	
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x06;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + 0x06;
 	lcd_strobe();
 	
 	osDelay(5);
 	
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + mode;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + mode;
 	lcd_strobe();
 	
 // 	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
 // 	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x28;
 // 	lcd_strobe();
 	
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x0E;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR & 0xFF00;
+	GPIO_PORT_LCD->ODR = GPIO_PORT_LCD->ODR + 0x0E;
 	lcd_strobe();
 
 	lcd_clear();	// Clear screen
@@ -137,9 +137,9 @@ void lcd_putch(char);
 
 void lcd_strobe(void){
 	
-	GPIO_PORT->BSRRL = LCD_EN;
+	GPIO_PORT_LCD->BSRRL = LCD_EN;
 	osDelay(20);
-	GPIO_PORT->BSRRH = LCD_EN;	
+	GPIO_PORT_LCD->BSRRH = LCD_EN;	
 }
 
 
