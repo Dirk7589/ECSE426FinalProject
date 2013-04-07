@@ -10,8 +10,8 @@
 #define __KEYPAD_H
 
 /*Hardware Defines*/
-#define GPIO_PORT GPIOE /**<Defines the GPIO port*/
-#define GPIO_CLOCK	RCC_AHB1Periph_GPIOE /**<Defines the GPIO peripheral clock*/
+#define GPIO_PORT_KEY GPIOE /**<Defines the GPIO port*/
+#define GPIO_CLOCK_KEY	RCC_AHB1Periph_GPIOE /**<Defines the GPIO peripheral clock*/
 
 #define ROW_0 GPIO_Pin_8
 #define ROW_1 GPIO_Pin_9
