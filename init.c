@@ -46,11 +46,11 @@ void initIO(void)
 	
 	GPIO_Init(GPIOA, &gpio_init_button); //Intialize port
 	
-	gpio_init_button.GPIO_Pin	= GPIO_Pin_4; //Set button input
-	GPIO_Init(GPIOE, &gpio_init_button); //Intialize port
-	
-	gpio_init_button.GPIO_Pin	= GPIO_Pin_3; //Set button input
-	GPIO_Init(GPIOE, &gpio_init_button); //Intialize port
+// 	gpio_init_button.GPIO_Pin	= GPIO_Pin_4; //Set button input
+// 	GPIO_Init(GPIOE, &gpio_init_button); //Intialize port
+// 	
+// 	gpio_init_button.GPIO_Pin	= GPIO_Pin_3; //Set button input
+// 	GPIO_Init(GPIOE, &gpio_init_button); //Intialize port
 	
 }
 
@@ -211,36 +211,36 @@ void initEXTIButton(void)
 	NVIC_Init(&NVIC_Struct); //Setup NVIC with struct//Configure the NVIC for use with EXTI
 	
 	
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource4);	//Select pin to interupt from
-	
-	exti_init.EXTI_Line = EXTI_Line4; //Select line 1
-	exti_init.EXTI_LineCmd = ENABLE; //Enable
-	exti_init.EXTI_Mode = EXTI_Mode_Interrupt; //Interupt mode
-	exti_init.EXTI_Trigger = EXTI_Trigger_Rising; //Rising edge trigger
-	
-	EXTI_Init(&exti_init);	//Configure the interupt mode
-	
-	NVIC_Struct.NVIC_IRQChannel = EXTI4_IRQn; //Select EXTI0
-	NVIC_Struct.NVIC_IRQChannelPreemptionPriority = 0; //Set preemption priority
-	NVIC_Struct.NVIC_IRQChannelSubPriority = 0; //Set sub prioirity
-	NVIC_Struct.NVIC_IRQChannelCmd = ENABLE; //Enable NIVC
-	
-	NVIC_Init(&NVIC_Struct); //Setup NVIC with struct//Configure the NVIC for use with EXTI
-	
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource3);	//Select pin to interupt from
-	
-	exti_init.EXTI_Line = EXTI_Line3; //Select line 1
-	exti_init.EXTI_LineCmd = ENABLE; //Enable
-	exti_init.EXTI_Mode = EXTI_Mode_Interrupt; //Interupt mode
-	exti_init.EXTI_Trigger = EXTI_Trigger_Rising; //Rising edge trigger
-	
-	EXTI_Init(&exti_init);	//Configure the interupt mode
-	
-	NVIC_Struct.NVIC_IRQChannel = EXTI3_IRQn; //Select EXTI0
-	NVIC_Struct.NVIC_IRQChannelPreemptionPriority = 0; //Set preemption priority
-	NVIC_Struct.NVIC_IRQChannelSubPriority = 0; //Set sub prioirity
-	NVIC_Struct.NVIC_IRQChannelCmd = ENABLE; //Enable NIVC
-	
-	NVIC_Init(&NVIC_Struct); //Setup NVIC with struct//Configure the NVIC for use with EXTI
+// 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource4);	//Select pin to interupt from
+// 	
+// 	exti_init.EXTI_Line = EXTI_Line4; //Select line 1
+// 	exti_init.EXTI_LineCmd = ENABLE; //Enable
+// 	exti_init.EXTI_Mode = EXTI_Mode_Interrupt; //Interupt mode
+// 	exti_init.EXTI_Trigger = EXTI_Trigger_Rising; //Rising edge trigger
+// 	
+// 	EXTI_Init(&exti_init);	//Configure the interupt mode
+// 	
+// 	NVIC_Struct.NVIC_IRQChannel = EXTI4_IRQn; //Select EXTI0
+// 	NVIC_Struct.NVIC_IRQChannelPreemptionPriority = 0; //Set preemption priority
+// 	NVIC_Struct.NVIC_IRQChannelSubPriority = 0; //Set sub prioirity
+// 	NVIC_Struct.NVIC_IRQChannelCmd = ENABLE; //Enable NIVC
+// 	
+// 	NVIC_Init(&NVIC_Struct); //Setup NVIC with struct//Configure the NVIC for use with EXTI
+// 	
+// 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource3);	//Select pin to interupt from
+// 	
+// 	exti_init.EXTI_Line = EXTI_Line3; //Select line 1
+// 	exti_init.EXTI_LineCmd = ENABLE; //Enable
+// 	exti_init.EXTI_Mode = EXTI_Mode_Interrupt; //Interupt mode
+// 	exti_init.EXTI_Trigger = EXTI_Trigger_Rising; //Rising edge trigger
+// 	
+// 	EXTI_Init(&exti_init);	//Configure the interupt mode
+// 	
+// 	NVIC_Struct.NVIC_IRQChannel = EXTI3_IRQn; //Select EXTI0
+// 	NVIC_Struct.NVIC_IRQChannelPreemptionPriority = 0; //Set preemption priority
+// 	NVIC_Struct.NVIC_IRQChannelSubPriority = 0; //Set sub prioirity
+// 	NVIC_Struct.NVIC_IRQChannelCmd = ENABLE; //Enable NIVC
+// 	
+// 	NVIC_Init(&NVIC_Struct); //Setup NVIC with struct//Configure the NVIC for use with EXTI
 }
 
