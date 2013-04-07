@@ -38,13 +38,14 @@
 
 #define LCD_CLEAR_CMD 0x01 /**<Clears the LCD*/
 #define LCD_CURSOR_ON 0x0E /**<Turns the cursor on and blink off*/
+#define LCD_CURSOR_LINE_2 40 /**<Index of the first character on the second line of the LCD*/
 
 /**
 *@brief Writes a byte to the LCD
 *@param[in] c The byte to be written to the display
 *@retval None
 */
-void lcd_write(uint8_t c);
+void lcd_write(char c);
 
 /**
 *@brief Clear and home the LCD

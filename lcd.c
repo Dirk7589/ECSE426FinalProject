@@ -19,7 +19,7 @@ static uint8_t mode;
 *@param[in] char The byte to be written to the display
 *@retval None
 */
-void lcd_write(uint8_t c){
+void lcd_write(char c){
 	
 	if(mode == MODE_8_BIT){
 		GPIO_PORT->BSRRL = LCD_RS; //Set RS high
@@ -64,7 +64,14 @@ void lcd_puts(const char * s){
 *@param[in] pos Move the cursor to the position specified
 *@retval None
 */
-void lcd_goto(unsigned char pos);
+void lcd_goto(unsigned char pos){
+	GPIO_PORT->BSRRH = LCD_RS;	//set RS low
+	
+	pos = pos + 0x80;
+	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
+	GPIO_PORT->ODR = GPIO_PORT->ODR + pos;
+	lcd_strobe();	//write the clear command
+}
 
 /**
 *@brief Intialize the LCD in either 4-bit or 8-bit mode
@@ -75,6 +82,8 @@ void lcd_goto(unsigned char pos);
 void lcd_init(uint16_t m){
 	mode = m;
 	RCC_AHB1PeriphClockCmd(GPIO_CLOCK, ENABLE); //Setup the peripheral clock
+	
+	osDelay(50);
 	
 	GPIO_InitTypeDef gpio_init_lcd;			//Create the intialization struct
 	GPIO_StructInit(&gpio_init_lcd);		//Intialize the struct
@@ -108,12 +117,12 @@ void lcd_init(uint16_t m){
 	GPIO_PORT->ODR = GPIO_PORT->ODR + mode;
 	lcd_strobe();
 	
-	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x28;
-	lcd_strobe();
+// 	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
+// 	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x28;
+// 	lcd_strobe();
 	
 	GPIO_PORT->ODR = GPIO_PORT->ODR & 0xFF00;
-	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x0F;
+	GPIO_PORT->ODR = GPIO_PORT->ODR + 0x0E;
 	lcd_strobe();
 
 	lcd_clear();	// Clear screen
