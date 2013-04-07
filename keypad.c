@@ -59,7 +59,7 @@ char keypadRead(void){
 	}
 	GPIO_PORT->BSRRH = COLUMN_2;
 	
-	return '\0';
+	return 'E';
 }
 
 void keypadInit(void){
@@ -72,7 +72,7 @@ void keypadInit(void){
 	gpio_init_key.GPIO_Mode = GPIO_Mode_OUT; //Set as output
 	gpio_init_key.GPIO_Speed = GPIO_Speed_100MHz; //Set at max slew rate
 	gpio_init_key.GPIO_OType = GPIO_OType_PP; //Push Pull config
-	gpio_init_key.GPIO_PuPd = GPIO_PuPd_DOWN; //Turn off pull ups 
+	gpio_init_key.GPIO_PuPd = GPIO_PuPd_NOPULL; //Turn off pull ups 
 	
 	GPIO_Init(GPIO_PORT, &gpio_init_key); //Intialize port
 	
@@ -80,7 +80,7 @@ void keypadInit(void){
 	gpio_init_key.GPIO_Mode = GPIO_Mode_IN; //Set as output
 	gpio_init_key.GPIO_Speed = GPIO_Speed_100MHz; //Set at max slew rate
 	gpio_init_key.GPIO_OType = GPIO_OType_PP; //Push Pull config
-	gpio_init_key.GPIO_PuPd = GPIO_PuPd_NOPULL; //Turn off pull ups 
+	gpio_init_key.GPIO_PuPd = GPIO_PuPd_DOWN; //Turn off pull ups 
 	
 	GPIO_Init(GPIO_PORT, &gpio_init_key); //Intialize port
 }
