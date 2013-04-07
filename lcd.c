@@ -94,7 +94,7 @@ void lcd_init(uint16_t m){
 	gpio_init_lcd.GPIO_OType = GPIO_OType_PP; //Push Pull config
 	gpio_init_lcd.GPIO_PuPd = GPIO_PuPd_NOPULL; //Turn off pull ups 
 	
-	GPIO_Init(GPIOD, &gpio_init_lcd); //Intialize port
+	GPIO_Init(GPIO_PORT, &gpio_init_lcd); //Intialize port
 	
 	GPIO_PORT->ODR = 0x30; 
 	GPIO_PORT->BSRRH = LCD_RS; //Place in write mode
