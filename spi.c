@@ -78,7 +78,7 @@ void initSPI(void){
 *@param[in] csPin The GPIO pin that the CS line is connected to for SPI1
 *@retval None
 */
-void SPI_DMA_Transfer(const uint8_t* rx, const uint8_t* tx, const uint8_t bufferSize, GPIO_TypeDef* csPort, uint8_t csPin){
+void SPI_DMA_Transfer(const uint8_t* rx, const uint8_t* tx, const uint8_t bufferSize, GPIO_TypeDef* csPort, uint16_t csPin){
 	osMutexWait(dmaId, osWaitForever);//Check that DMA is avaible using mutex
 
 	if((csPort == GPIOE) && (csPin == 0x0008)){
