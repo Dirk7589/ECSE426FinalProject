@@ -11,55 +11,71 @@
 #include "keypad.h"
 
 char keypadRead(void){
+	char value = 'E';
 	//read from column 0
 	GPIO_PORT_KEY->BSRRL = COLUMN_0;
+	// Delay for debouncing
+	osDelay(5);
 	if(GPIO_PORT_KEY->IDR & ROW_0){
-		return '1';
+		value = '1';
 	}
 	else if(GPIO_PORT_KEY->IDR & ROW_1){
-		return '4';
+		value = '4';
 	}
 	else if(GPIO_PORT_KEY->IDR & ROW_2){
-		return '7';
+		value = '7';
 	}
 	else if(GPIO_PORT_KEY->IDR & ROW_3){
-		return '*';
+		value = '*';
 	}
 	GPIO_PORT_KEY->BSRRH = COLUMN_0;
 	
-	//read from column 1
-	GPIO_PORT_KEY->BSRRL = COLUMN_1;
-	if(GPIO_PORT_KEY->IDR & ROW_0){
-		return '2';
-	}
-	else if(GPIO_PORT_KEY->IDR & ROW_1){
-		return '5';
-	}
-	else if(GPIO_PORT_KEY->IDR & ROW_2){
-		return '8';
-	}
-	else if(GPIO_PORT_KEY->IDR & ROW_3){
-		return '0';
-	}
-	GPIO_PORT_KEY->BSRRH = COLUMN_1;	
 	
-	//read from column 2
-	GPIO_PORT_KEY->BSRRL = COLUMN_2;
-	if(GPIO_PORT_KEY->IDR & ROW_0){
-		return '3';
-	}
-	else if(GPIO_PORT_KEY->IDR & ROW_1){
-		return '6';
-	}
-	else if(GPIO_PORT_KEY->IDR & ROW_2){
-		return '9';
-	}
-	else if(GPIO_PORT_KEY->IDR & ROW_3){
-		return '#';
-	}
-	GPIO_PORT_KEY->BSRRH = COLUMN_2;
 	
-	return 'E';
+	if (value == 'E') {
+		//read from column 1
+		GPIO_PORT_KEY->BSRRL = COLUMN_1;
+		// Delay for debouncing
+		osDelay(5);
+		if(GPIO_PORT_KEY->IDR & ROW_0){
+			value = '2';
+		}
+		else if(GPIO_PORT_KEY->IDR & ROW_1){
+			value = '5';
+		}
+		else if(GPIO_PORT_KEY->IDR & ROW_2){
+			value = '8';
+		}
+		else if(GPIO_PORT_KEY->IDR & ROW_3){
+			value = '0';
+		}
+		GPIO_PORT_KEY->BSRRH = COLUMN_1;	
+	}
+	
+	if (value == 'E') {
+		//read from column 2
+		GPIO_PORT_KEY->BSRRL = COLUMN_2;
+		// Delay for debouncing
+		osDelay(5);
+		if(GPIO_PORT_KEY->IDR & ROW_0){
+			value = '3';
+		}
+		else if(GPIO_PORT_KEY->IDR & ROW_1){
+			value = '6';
+		}
+		else if(GPIO_PORT_KEY->IDR & ROW_2){
+			value = '9';
+		}
+		else if(GPIO_PORT_KEY->IDR & ROW_3){
+			value = '#';
+		}
+		GPIO_PORT_KEY->BSRRH = COLUMN_2;
+	}
+	
+	// Delay for debouncing
+	osDelay(50);
+	
+	return value;
 }
 
 void keypadInit(void){
