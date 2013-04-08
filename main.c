@@ -43,6 +43,8 @@ uint8_t wirelessRdy = 0x08;
 uint8_t LEDState = 0; //Led state variable
 uint8_t orientationMatch = 0;
 uint8_t LEDCounter = 0;
+uint8_t volumeUp = 0;
+uint8_t volumeDown = 0;
 
 uint8_t tx[7] = {0x29|0x40|0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Transmission buffer for ACC for DMA*/
 uint8_t rx[7] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Receive buffer for ACC for DMA*/
@@ -189,8 +191,8 @@ int main (void) {
 	kThread = osThreadCreate(osThread(keypadThread), NULL);
 	lThread = osThreadCreate(osThread(lcdThread), NULL);
 	
-	//aThread = osThreadCreate(osThread(accelerometerThread), NULL);
-	//wThread = osThreadCreate(osThread(wirelessThread), NULL);
+	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
+	wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
 	displayUI(); //Main display function
 }	
@@ -477,6 +479,32 @@ void EXTI1_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
 		tapState = 1 - tapState;	//change the current tap state
 		EXTI_ClearITPendingBit(EXTI_Line1);	//Clear the EXTI1 interrupt flag
+	}
+}
+
+/**
+*@brief An interrupt handler for EXTI2
+*@retval None
+*/
+
+void EXTI2_IRQHandler(void)
+{
+	if(EXTI_GetITStatus(EXTI_Line2) != RESET){
+		volumeDown = 1 - volumeDown;
+		EXTI_ClearITPendingBit(EXTI_Line2);	//Clear the EXTI2 interrupt flag
+	}
+}
+
+/**
+*@brief An interrupt handler for EXTI4
+*@retval None
+*/
+
+void EXTI4_IRQHandler(void)
+{
+	if(EXTI_GetITStatus(EXTI_Line4) != RESET){
+		volumeUp = 1 - volumeUp;
+		EXTI_ClearITPendingBit(EXTI_Line4);	//Clear the EXTI4 interrupt flag
 	}
 }
 
