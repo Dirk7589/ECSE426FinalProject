@@ -60,8 +60,8 @@ void initACC(void)
 		//Enable interupts for Tap Detection for the LIS302DL
     LIS302DL_InterruptConfigTypeDef LIS302DL_InterruptConfigStruct; //Define struct
     
-		ctrl = 0x38; //Correct mask value for click interupt
-		LIS302DL_Write(&ctrl, LIS302DL_CTRL_REG3_ADDR, 1); //Configure control register for click interupt
+	ctrl = 0x38; //Correct mask value for click interupt
+	LIS302DL_Write(&ctrl, LIS302DL_CTRL_REG3_ADDR, 1); //Configure control register for click interupt
 	
     LIS302DL_InterruptConfigStruct.Latch_Request = LIS302DL_INTERRUPTREQUEST_NOTLATCHED; //Latch interupt request
     LIS302DL_InterruptConfigStruct.SingleClick_Axes = LIS302DL_CLICKINTERRUPT_Z_ENABLE; //Enable single click interupt for all 3 axes
@@ -69,22 +69,22 @@ void initACC(void)
     
     LIS302DL_InterruptConfig(&LIS302DL_InterruptConfigStruct); //Intialize the LIS302DL interupts behavior
 
-		//Set remaining properties of the click interupt not configured by LIS302DL_InterruptConfig
-		//They can be found in the LIS302DL data sheet section 7.
-		ctrl = 0xFF;
-		LIS302DL_Write(&ctrl, LIS302DL_CLICK_THSY_X_REG_ADDR, 1); //Setup minimum threshold for an interupt to occur
-		
-		ctrl = 0x0F;
-		LIS302DL_Write(&ctrl, LIS302DL_CLICK_THSZ_REG_ADDR, 1); //Setup minimum threshold for an interupt to occur
-		
-		ctrl = 0x03;
-		LIS302DL_Write(&ctrl, LIS302DL_CLICK_TIMELIMIT_REG_ADDR, 1); //Set time limit between interupt
-		
-		ctrl = 0xFA;
-		LIS302DL_Write(&ctrl, LIS302DL_CLICK_LATENCY_REG_ADDR, 1); //Set latency before interupt is tripped
-		
-		ctrl = 0xFF;
-		LIS302DL_Write(&ctrl, LIS302DL_CLICK_WINDOW_REG_ADDR, 1); //Set the window for latency and time limit.
+	//Set remaining properties of the click interupt not configured by LIS302DL_InterruptConfig
+	//They can be found in the LIS302DL data sheet section 7.
+	ctrl = 0xFF;
+	LIS302DL_Write(&ctrl, LIS302DL_CLICK_THSY_X_REG_ADDR, 1); //Setup minimum threshold for an interupt to occur
+	
+	ctrl = 0x0F;
+	LIS302DL_Write(&ctrl, LIS302DL_CLICK_THSZ_REG_ADDR, 1); //Setup minimum threshold for an interupt to occur
+	
+	ctrl = 0x03;
+	LIS302DL_Write(&ctrl, LIS302DL_CLICK_TIMELIMIT_REG_ADDR, 1); //Set time limit between interupt
+	
+	ctrl = 0xFA;
+	LIS302DL_Write(&ctrl, LIS302DL_CLICK_LATENCY_REG_ADDR, 1); //Set latency before interupt is tripped
+	
+	ctrl = 0xFF;
+	LIS302DL_Write(&ctrl, LIS302DL_CLICK_WINDOW_REG_ADDR, 1); //Set the window for latency and time limit.
 } 
 
 /**
@@ -179,9 +179,9 @@ void initEXTIACC(void)
 	//Enable the NVIC if needed
 	NVIC_InitTypeDef NVIC_Struct; //Create intialization struct for NVIC
 	
-	NVIC_Struct.NVIC_IRQChannel = EXTI1_IRQn; //Select EXTI0
+	NVIC_Struct.NVIC_IRQChannel = EXTI1_IRQn; //Select EXTI1
 	NVIC_Struct.NVIC_IRQChannelPreemptionPriority = 0; //Set preemption priority
-	NVIC_Struct.NVIC_IRQChannelSubPriority = 1; //Set sub prioirity
+	NVIC_Struct.NVIC_IRQChannelSubPriority = 0; //Set sub prioirity
 	NVIC_Struct.NVIC_IRQChannelCmd = ENABLE; //Enable NIVC
 	
 	NVIC_Init(&NVIC_Struct); //Setup NVIC with struct//Configure the NVIC for use with EXTI
