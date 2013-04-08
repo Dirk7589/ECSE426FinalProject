@@ -28,15 +28,18 @@
 #define TRANSMIT_WIRELESS 0
 #define USER_BTN 0x0001 /*!<Defines the bit location of the user button*/
 #define THRESHOLD_ANGLE 10
+#define TRANSMITTER 1
 
 
 /*Global Variables*/
 uint8_t sampleACCFlag = 0x01; /**<A flag variable for sampling, restricted to a value of 0 or 1*/
 uint8_t buttonState = 1; /**<A variable that represents the current state of the button*/
+uint8_t tapState = 0;
 uint8_t dmaFlag = 0x02; /**<A flag variable that represent the DMA flag*/
+uint8_t readKeypadFlag = 0x01; /**<A flag variable that represents the keypad poll*/
+uint8_t displayLCDFlag = 0x01; /**<A flag variable that represents the display poll*/
 uint8_t wirelessFlag = 0x04; /**<A flag variable that represents the wireless flag*/
 uint8_t wirelessRdy = 0x08; 
-//uint8_t dmaInitFlag = 0;
 uint8_t LEDState = 0; //Led state variable
 uint8_t orientationMatch = 0;
 uint8_t LEDCounter = 0;
@@ -47,8 +50,7 @@ uint8_t rx[7] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Receive buffer f
 uint8_t const* txptr = &tx[0];
 uint8_t* rxptr = &rx[0];
 int8_t wirelessAngles[2] = {0,0};
-
-int8_t swapped = 0;
+char key = 'E';
 
 //Declare global variables externed in common.h
 int8_t txWireless[WIRELESS_BUFFER_SIZE] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Transmission buffer for Wireless for DMA*/
@@ -70,8 +72,8 @@ uint8_t txWirelessInit[WIRELESS_BUFFER_INIT_SIZE] = {0x00|MULTIPLEBYTE_WR, SMART
 			SMARTRF_SETTING_TEST0}; /**<Transmission buffer for Wireless for DMA*/
 
 uint8_t rxWirelessInit[WIRELESS_BUFFER_INIT_SIZE] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-																										 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-																										 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+													 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+													 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 uint8_t strobeCommand[1] = {0x00};
 uint8_t status[1] = {0x00};
@@ -121,13 +123,19 @@ void displayPitchRoll(void);
  */
 void accelerometerThread(void const * argument);
 void wirelessThread(void const * argument);
+void keypadThread(void const * argument);
+void lcdThread(void const * argument);
 
 //Thread structure for above thread
 osThreadDef(accelerometerThread, osPriorityNormal, 1, 0);
 osThreadDef(wirelessThread, osPriorityNormal, 1, 0);
+osThreadDef(keypadThread, osPriorityNormal, 1, 0);
+osThreadDef(lcdThread, osPriorityNormal, 1, 0);
 
 osThreadId aThread; //Accelerometer thread ID
 osThreadId wThread; //Wireless thread ID
+osThreadId kThread; //Keypad thread ID
+osThreadId lThread; //LCD thread ID
 
 
 /**
@@ -145,11 +153,18 @@ int main (void) {
 	initTim3(); //Enable Tim3 at 100Hz
 	initACC(); //Enable the accelerometer
 	initDMA(); //Enable DMA for the accelerometer
-	initEXTIButton(); //Enable button interrupts via exti1
+	initEXTIButton(); //Enable button interrupts via exti0
+	
+	#if TRANSMITTER
+		initEXTIACC();	//Enable tap interrupts via exti1
+	#endif
+	
 	initSPI(); //Enable SPI for wireless
 	initWireless(); //Configure the wireless module
-	//lcd_init(MODE_8_BIT); 
-	//keypadInit();
+	lcd_init(MODE_8_BIT); 
+	keypadInit();
+
+	
 	wirelessRead(rxWirelessInit,0x00,WIRELESS_BUFFER_INIT_SIZE);
 	
 	#if DEBUG
@@ -163,14 +178,19 @@ int main (void) {
 		char key = 'e';
 		while(1){
 			key = keypadRead();
-			lcd_write(key);
+			if (key != 'E'){
+				lcd_clear();
+				lcd_write(key);
+			}
 		}
-			
-		
+
 	#endif
 	// Start threads
-	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
-	wThread = osThreadCreate(osThread(wirelessThread), NULL);
+	kThread = osThreadCreate(osThread(keypadThread), NULL);
+	lThread = osThreadCreate(osThread(lcdThread), NULL);
+	
+	//aThread = osThreadCreate(osThread(accelerometerThread), NULL);
+	//wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
 	displayUI(); //Main display function
 }	
@@ -219,8 +239,6 @@ void accelerometerThread(void const * argument){
 		osSignalSet(wThread, wirelessFlag); //Set wireless signal
 	}
 }
-
-
 
 void wirelessThread(void const * argument){
 	
@@ -370,7 +388,21 @@ void wirelessThread(void const * argument){
 			}
 		}
 		
+}
+
+void keypadThread(void const * argument){
+	while(1){
+		osSignalWait(readKeypadFlag, osWaitForever);
+		key = keypadRead();
 	}
+}
+
+void lcdThread(void const * argument){
+	while(1){
+		osSignalWait(displayLCDFlag, osWaitForever);	
+		lcd_write(key);
+	}
+}
 
 /**
 *@brief A function that runs the display user interface
@@ -430,9 +462,21 @@ void displayPitchRoll(){
 void EXTI0_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
-		buttonState = 1 - buttonState;	//Change the current tap state
+		buttonState = 1 - buttonState;	//Change the current button state
 		EXTI_ClearITPendingBit(EXTI_Line0);	//Clear the EXTI0 interrupt flag
-		//swapped = 1 - swapped;
+	}
+}
+
+/**
+*@brief An interrupt handler for EXTI1
+*@retval None
+*/
+
+void EXTI1_IRQHandler(void)
+{
+	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
+		tapState = 1 - tapState;	//change the current tap state
+		EXTI_ClearITPendingBit(EXTI_Line1);	//Clear the EXTI1 interrupt flag
 	}
 }
 
@@ -443,6 +487,8 @@ void EXTI0_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
 	osSignalSet(aThread, sampleACCFlag);
+	osSignalSet(kThread, readKeypadFlag);
+	osSignalSet(lThread, displayLCDFlag);
 	LEDCounter++;
 	if(LEDCounter == 25){
 		LEDCounter = 0;
