@@ -29,6 +29,7 @@
 #define USER_BTN 0x0001 /*!<Defines the bit location of the user button*/
 #define THRESHOLD_ANGLE 10
 #define TRANSMITTER 1
+#define USE_LED_UI 0
 
 
 /*Global Variables*/
@@ -43,8 +44,10 @@ uint8_t wirelessRdy = 0x08;
 uint8_t LEDState = 0; //Led state variable
 uint8_t orientationMatch = 0;
 uint8_t LEDCounter = 0;
-uint8_t volumeUp = 0;
-uint8_t volumeDown = 0;
+uint8_t volumeUpBtn = 0;
+uint8_t volumeDownBtn = 0;
+uint8_t volumeUpBtnPressed = 0;
+uint8_t volumeDownBtnPressed = 0;
 
 uint8_t tx[7] = {0x29|0x40|0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Transmission buffer for ACC for DMA*/
 uint8_t rx[7] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Receive buffer for ACC for DMA*/
@@ -84,9 +87,15 @@ float accCorrectedValues[3];
 float wirelessAccValues[3] = {0,0,0};
 float angles[2];
 int32_t accValues[3];
+uint8_t audioVolume = 0; // Volume initially muted
+
 
 uint8_t dmaFromAccFlag = 0; /**<A flag variable that represents whether or not DMA was called from the accelerometer thread*/
 uint8_t dmaFromWirelessFlag = 0; /**<A flag variable that represents whether or not DMA was called from the wireless thread*/
+
+//Define OS timers for global variable externed in common.h
+osTimer(debounce)
+osTimerDef(debounce, function) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
 
 //Define semaphores for global variable externed in common.h
 osSemaphoreDef(accCorrectedValues)
@@ -100,6 +109,9 @@ osSemaphoreId txId;
 
 osSemaphoreDef(rxWireless)
 osSemaphoreId rxId;
+
+osSemaphoreDef(audioVolume)
+osSemaphoreId vlmId;
 
 //Define Mutexes
 
@@ -118,6 +130,12 @@ void displayUI(void);
 *@retval None
 */
 void displayPitchRoll(void);
+
+/**
+*@brief A function that controls the volume of the audio device
+*@retval None
+*/
+void volumeControl(void);
 
 /*!
  @brief Thread to perform the accelerometer data processing
@@ -194,7 +212,11 @@ int main (void) {
 	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
 	wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
+	#if USE_LED_UI
 	displayUI(); //Main display function
+	#else
+	volumeControl();	
+	#endif
 }	
 
 void accelerometerThread(void const * argument){
@@ -457,6 +479,39 @@ void displayPitchRoll(){
 	
 }
 
+void volumeControl(void){
+	uint8_t volume = 0;
+	while(1){
+		if (volumeUpBtn == 1) {
+			//Debounce volume up button on GPIOE_Pin4
+			osDelay(100);
+			while(GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_4));
+			volumeUpBtn = 0;
+			
+			//Increase the volume variable
+			getVolume(&volume);
+			//if (volume < 10) { //Change the 10 to a define called MAX_VOLUME
+				volume++;
+				setVolume(volume);
+			//}
+		}
+		
+		if (volumeDownBtn == 1) {
+			//Debouce volume down button on GPIOE_Pin2
+			osDelay(100);
+			while(GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_2));
+			volumeDownBtn = 0;
+			
+			//Decrease the volume variable
+			getVolume(&volume);
+			//if (volume > 0) { //Change the 0 to a define called MIN_VOLUME
+				volume--;
+				setVolume(volume);
+			//}
+		}
+	}
+}
+
 /**
 *@brief An interrupt handler for EXTI0
 *@retval None
@@ -483,27 +538,27 @@ void EXTI1_IRQHandler(void)
 }
 
 /**
-*@brief An interrupt handler for EXTI2
+*@brief An interrupt handler for EXTI2 for volume down
 *@retval None
 */
 
 void EXTI2_IRQHandler(void)
-{
+ {
 	if(EXTI_GetITStatus(EXTI_Line2) != RESET){
-		volumeDown = 1 - volumeDown;
+		volumeDownBtn = 1;
 		EXTI_ClearITPendingBit(EXTI_Line2);	//Clear the EXTI2 interrupt flag
 	}
 }
 
 /**
-*@brief An interrupt handler for EXTI4
+*@brief An interrupt handler for EXTI4 for volume up
 *@retval None
 */
 
 void EXTI4_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line4) != RESET){
-		volumeUp = 1 - volumeUp;
+		volumeUpBtn = 1;
 		EXTI_ClearITPendingBit(EXTI_Line4);	//Clear the EXTI4 interrupt flag
 	}
 }
@@ -521,10 +576,10 @@ void TIM3_IRQHandler(void)
 	if(LEDCounter == 25){
 		LEDCounter = 0;
 		
-		if(orientationMatch == 1){
-			orientationMatch = 0;
-			LEDState = LEDToggle(LEDState);
-		}
+	if(orientationMatch == 1){
+		orientationMatch = 0;
+		LEDState = LEDToggle(LEDState);
+	}
 	}
 	
 	TIM_ClearITPendingBit(TIM3, TIM_IT_Update); //Clear the TIM3 interupt bit
