@@ -45,4 +45,21 @@ void getRecieved(uint8_t* rxBuffer, uint8_t bufferSize);
 *@retval None
 */
 void setTransmit(uint8_t* txBuffer);
+
+/**
+*@brief A function that safely access's the device audio volume
+*@param[inout]  A pointer to the new location in memory that data is copied to
+*@retval None
+*/
+void getVolume(uint8_t* vlmToGet);
+
+/**
+*@brief A function that safely access's the device audio volume
+*@param[inout]  A value to set pointer to the new location in memory that data is copied to
+*@retval None
+*/
+void setVolume(uint8_t vlmToSet);
+
+
+
 #endif
