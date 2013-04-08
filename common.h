@@ -37,4 +37,6 @@ extern osSemaphoreId rxId; /**<The id for the rx buffer semaphore*/
 extern osSemaphoreId txId; /**<The id for the tx buffer semaphore*/
 
 extern osMutexId dmaId; /**<The id for the DMA mutex*/
+
+extern char key;
 #endif
