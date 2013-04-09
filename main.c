@@ -457,20 +457,16 @@ void displayPitchRoll(){
 	//float wirelessAcceleration[3];
 	float localAngles[2];
 	int8_t remoteAngles[2];
-	float rollAngleDiff;
-	float pitchAngleDiff;
 	
 	switch(buttonState){
 			case 0: //receive
 				
 				//get the accelerometer readings of both boards for comparison
 				getACCValues(acceleration);
-// 				getWirelessACCValues(wirelessAcceleration);
 				getWirelessAngles(remoteAngles);
 			
 				//get the pitch and roll for comparison
 				toAngle(acceleration, localAngles);
-// 				toAngle(wirelessAcceleration, remoteAngles);
 			
 				//flash the LEDs if the boards are within a certain threshold of eachother on each axis
 				if((localAngles[0] - remoteAngles[0] < THRESHOLD_ANGLE) && (localAngles[0] - remoteAngles[0] > -THRESHOLD_ANGLE) && (localAngles[1] - remoteAngles[1] < THRESHOLD_ANGLE) && (localAngles[1] - remoteAngles[1] > -THRESHOLD_ANGLE)){
