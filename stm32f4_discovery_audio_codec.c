@@ -614,7 +614,7 @@ static uint32_t Codec_Init(uint16_t OutputDevice, uint8_t Volume, uint32_t Audio
   Codec_GPIO_Init();   
   
   /* Reset the Codec Registers */
-  Codec_Reset();
+  //Codec_Reset();
 
   /* Initialize the Control interface of the Audio Codec */
   Codec_CtrlInterface_Init();     
@@ -1172,16 +1172,16 @@ static void Codec_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-  /* Enable Reset GPIO Clock */
-  RCC_AHB1PeriphClockCmd(AUDIO_RESET_GPIO_CLK,ENABLE);
-  
-  /* Audio reset pin configuration -------------------------------------------------*/
-  GPIO_InitStructure.GPIO_Pin = AUDIO_RESET_PIN; 
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-  GPIO_Init(AUDIO_RESET_GPIO, &GPIO_InitStructure);    
+//   /* Enable Reset GPIO Clock */
+//   RCC_AHB1PeriphClockCmd(AUDIO_RESET_GPIO_CLK,ENABLE);
+//   
+//   /* Audio reset pin configuration -------------------------------------------------*/
+//   GPIO_InitStructure.GPIO_Pin = AUDIO_RESET_PIN; 
+//   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+//   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+//   GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+//   GPIO_Init(AUDIO_RESET_GPIO, &GPIO_InitStructure);    
   
   /* Enable I2S and I2C GPIO clocks */
   RCC_AHB1PeriphClockCmd(CODEC_I2C_GPIO_CLOCK | CODEC_I2S_GPIO_CLOCK, ENABLE);
