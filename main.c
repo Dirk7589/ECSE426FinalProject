@@ -23,6 +23,7 @@
 #include "lcd.h"
 #include "keypad.h"
 #include "dac.h"
+#include "isr.h"
 
 /*Defines */
 #define DEBUG 0
@@ -34,31 +35,29 @@
 
 
 /*Global Variables*/
+
+//ISR States and Flags
+uint8_t buttonState = 1; 
+uint8_t tapState = 0; 
+uint8_t volumeUpBtn = 0;
+uint8_t volumeDownBtn = 0;
+
+//OS Signal Masks
 uint8_t sampleACCFlag = 0x01; /**<A flag variable for sampling, restricted to a value of 0 or 1*/
-uint8_t buttonState = 1; /**<A variable that represents the current state of the button*/
-uint8_t tapState = 0;
-uint8_t dmaFlag = 0x02; /**<A flag variable that represent the DMA flag*/
 uint8_t readKeypadFlag = 0x01; /**<A flag variable that represents the keypad poll*/
 uint8_t displayLCDFlag = 0x01; /**<A flag variable that represents the display poll*/
 uint8_t wirelessFlag = 0x04; /**<A flag variable that represents the wireless flag*/
-uint8_t wirelessRdy = 0x08; 
-uint8_t LEDState = 0; //Led state variable
-uint8_t orientationMatch = 0;
-uint8_t LEDCounter = 0;
-uint8_t volumeUpBtn = 0;
-uint8_t volumeDownBtn = 0;
-uint8_t volumeUpBtnPressed = 0;
-uint8_t volumeDownBtnPressed = 0;
+uint8_t dmaFlag = 0x02; /**<A flag variable that represent the DMA flag*/
 
+/*********DMA Variables********/
 uint8_t tx[7] = {0x29|0x40|0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Transmission buffer for ACC for DMA*/
 uint8_t rx[7] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Receive buffer for ACC for DMA*/
 
 uint8_t const* txptr = &tx[0];
 uint8_t* rxptr = &rx[0];
 int8_t wirelessAngles[2] = {0,0};
-char key = 'E';
 
-//Declare global variables externed in common.h
+
 int8_t txWireless[WIRELESS_BUFFER_SIZE] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Transmission buffer for Wireless for DMA*/
 int8_t rxWireless[WIRELESS_BUFFER_SIZE] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; /**<Receive buffer for Wireless for DMA*/
 
@@ -84,10 +83,17 @@ uint8_t rxWirelessInit[WIRELESS_BUFFER_INIT_SIZE] = {0x00, 0x00, 0x00, 0x00, 0x0
 uint8_t strobeCommand[1] = {0x00};
 uint8_t status[1] = {0x00};
 
+//Other variables
 float accCorrectedValues[3];
 float wirelessAccValues[3] = {0,0,0};
 float angles[2];
 int32_t accValues[3];
+char key = 'E';
+uint8_t LEDState = 0; //Led state variable
+uint8_t orientationMatch = 0;
+uint8_t LEDCounter = 0;
+uint8_t volumeUpBtnPressed = 0;
+uint8_t volumeDownBtnPressed = 0;
 uint8_t audioVolume = 0; // Volume initially muted
 
 
@@ -95,8 +101,11 @@ uint8_t dmaFromAccFlag = 0; /**<A flag variable that represents whether or not D
 uint8_t dmaFromWirelessFlag = 0; /**<A flag variable that represents whether or not DMA was called from the wireless thread*/
 
 //Define OS timers for global variable externed in common.h
-//osTimer(debounce)
-//osTimerDef(debounce, function) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
+void enableEXTI2(void);
+osTimerDef(debounce, enableEXTI2) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
+
+osTimerId vlmUpId; /**<The id for the audio volume up EXTI timer*/
+osTimerId vlmDownId; /**<The id for the audio volume down EXTI timer*/
 
 //Define semaphores for global variable externed in common.h
 osSemaphoreDef(accCorrectedValues)
@@ -138,10 +147,7 @@ void displayPitchRoll(void);
 */
 void volumeControl(void);
 
-/*!
- @brief Thread to perform the accelerometer data processing
- @param argument Unused
- */
+/******Thread Prototypes*************/
 void accelerometerThread(void const * argument);
 void wirelessThread(void const * argument);
 void keypadThread(void const * argument);
@@ -169,6 +175,8 @@ int main (void) {
 	accId = osSemaphoreCreate(osSemaphore(accCorrectedValues), 1);
 	//Create mutex
 	dmaId = osMutexCreate(osMutex(dmaMutex));
+	//Create os timers
+	vlmDownId = osTimerCreate(osTimer(debounce), osTimerOnce, 0);
 	
 	initIO(); //Enable LEDs and button
 	initTim3(); //Enable Tim3 at 100Hz
@@ -514,99 +522,9 @@ void volumeControl(void){
 }
 
 /**
-*@brief An interrupt handler for EXTI0
+*@brief A function to enable interupts on EXTI2
 *@retval None
 */
-void EXTI0_IRQHandler(void)
-{
-	if(EXTI_GetITStatus(EXTI_Line0) != RESET){
-		buttonState = 1 - buttonState;	//Change the current button state
-		EXTI_ClearITPendingBit(EXTI_Line0);	//Clear the EXTI0 interrupt flag
-	}
-}
-
-/**
-*@brief An interrupt handler for EXTI1
-*@retval None
-*/
-
-void EXTI1_IRQHandler(void)
-{
-	if(EXTI_GetITStatus(EXTI_Line1) != RESET){
-		tapState = 1 - tapState;	//change the current tap state
-		EXTI_ClearITPendingBit(EXTI_Line1);	//Clear the EXTI1 interrupt flag
-	}
-}
-
-/**
-*@brief An interrupt handler for EXTI2 for volume down
-*@retval None
-*/
-
-void EXTI2_IRQHandler(void)
- {
-	if(EXTI_GetITStatus(EXTI_Line2) != RESET){
-		volumeDownBtn = 1;
-		EXTI_ClearITPendingBit(EXTI_Line2);	//Clear the EXTI2 interrupt flag
-	}
-}
-
-/**
-*@brief An interrupt handler for EXTI4 for volume up
-*@retval None
-*/
-
-void EXTI4_IRQHandler(void)
-{
-	if(EXTI_GetITStatus(EXTI_Line4) != RESET){
-		volumeUpBtn = 1;
-		EXTI_ClearITPendingBit(EXTI_Line4);	//Clear the EXTI4 interrupt flag
-	}
-}
-
-/**
-*@brief An interrupt handler for Tim3
-*@retval None
-*/
-void TIM3_IRQHandler(void)
-{
-	osSignalSet(aThread, sampleACCFlag);
-	osSignalSet(kThread, readKeypadFlag);
-	osSignalSet(lThread, displayLCDFlag);
-	LEDCounter++;
-	if(LEDCounter == 25){
-		LEDCounter = 0;
-		
-	if(orientationMatch == 1){
-		orientationMatch = 0;
-		LEDState = LEDToggle(LEDState);
-	}
-	}
-	
-	TIM_ClearITPendingBit(TIM3, TIM_IT_Update); //Clear the TIM3 interupt bit
-}
-
-/**
-*@brief An interrupt handler for DMA2_Stream0
-*@retval None
-*/
-void DMA2_Stream0_IRQHandler(void)
-{
-	DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0); //Clear the flag for transfer complete
-	DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3);
-
-	//Disable DMA
-	DMA_Cmd(DMA2_Stream0, DISABLE); // RX
-	DMA_Cmd(DMA2_Stream3, DISABLE); // TX
-	
-	if(dmaFromAccFlag){
-		dmaFromAccFlag = 0;
-		GPIO_SetBits(GPIOE, (uint16_t)0x0008);  //Raise CS Line for LIS302DL
-		osSignalSet(aThread, dmaFlag);				//Set flag for accelerometer sampling
-	}
-	if(dmaFromWirelessFlag){
-		dmaFromWirelessFlag = 0;
-		GPIO_SetBits(WIRELESS_CS_PORT, (uint16_t)WIRELESS_CS_PIN); //Raise CS Line for Wireless
-		osSignalSet(wThread, dmaFlag);
-	}
+void enableEXTI2(void){
+	EXTI->IMR &= ~EXTI_Line2;//DISABLE INTERUPTS ON EXTI2
 }
