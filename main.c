@@ -22,6 +22,7 @@
 #include "spi.h"
 #include "lcd.h"
 #include "keypad.h"
+#include "dac.h"
 
 /*Defines */
 #define DEBUG 0
@@ -94,8 +95,8 @@ uint8_t dmaFromAccFlag = 0; /**<A flag variable that represents whether or not D
 uint8_t dmaFromWirelessFlag = 0; /**<A flag variable that represents whether or not DMA was called from the wireless thread*/
 
 //Define OS timers for global variable externed in common.h
-osTimer(debounce)
-osTimerDef(debounce, function) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
+//osTimer(debounce)
+//osTimerDef(debounce, function) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
 
 //Define semaphores for global variable externed in common.h
 osSemaphoreDef(accCorrectedValues)
