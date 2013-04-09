@@ -7,7 +7,7 @@
 
 /*Includes*/
 #include "temp.h"
-
+#include "common.h"
 /*Global Variables*/
 
 
@@ -69,26 +69,5 @@ void displayTemperature(float temperature){
     }
 }
 
-/**
-*@brief A function that toggles the LEDs
-*@param[in] LEDState current state of the LEDs
-*@retval The current LEDState
-*/
-uint8_t LEDToggle(uint8_t LEDState){
-    if(!LEDState){
-        LEDState = 1; //update state
-        //Turn on LEDs
-        GPIOD->BSRRL = GREEN_LED;
-        GPIOD->BSRRL = ORANGE_LED;
-        GPIOD->BSRRL = RED_LED;
-        GPIOD->BSRRL = BLUE_LED;
-    }
-    else{
-        LEDState = 0; //update state
-        GPIOD->BSRRH = GREEN_LED | ORANGE_LED | RED_LED | BLUE_LED; //Turn off leds
-    }
-		
-		return LEDState;
-}
 
 
