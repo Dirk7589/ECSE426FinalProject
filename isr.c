@@ -81,6 +81,8 @@ void EXTI2_IRQHandler(void)
 void EXTI4_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line4) != RESET){
+		EXTI->IMR &= EXTI_Line4;//DISABLE INTERUPTS ON EXTI4
+		osTimerStart(vlmUpId, 250);//Start Timer
 		volumeUpBtn = 1;
 		EXTI_ClearITPendingBit(EXTI_Line4);	//Clear the EXTI4 interrupt flag
 	}
