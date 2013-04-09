@@ -102,7 +102,10 @@ uint8_t dmaFromWirelessFlag = 0; /**<A flag variable that represents whether or 
 
 //Define OS timers for global variable externed in common.h
 void enableEXTI2(void);
-osTimerDef(debounce, enableEXTI2) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
+osTimerDef(debounce2, enableEXTI2) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
+
+void enableEXTI4(void);
+osTimerDef(debounce4, enableEXTI4)
 
 osTimerId vlmUpId; /**<The id for the audio volume up EXTI timer*/
 osTimerId vlmDownId; /**<The id for the audio volume down EXTI timer*/
@@ -171,13 +174,13 @@ osThreadId lThread; //LCD thread ID
 */
 int main (void) {	
 
-	//Create necessary semaphores
-	accId = osSemaphoreCreate(osSemaphore(accCorrectedValues), 1);
-	//Create mutex
-	dmaId = osMutexCreate(osMutex(dmaMutex));
-	//Create os timers
-	vlmDownId = osTimerCreate(osTimer(debounce), osTimerOnce, 0);
+	//Os semaphore, thread, and mutex creation
+	accId = osSemaphoreCreate(osSemaphore(accCorrectedValues), 1); 	//Create necessary semaphores
+	dmaId = osMutexCreate(osMutex(dmaMutex)); 	//Create mutex
+	vlmDownId = osTimerCreate(osTimer(debounce2), osTimerOnce, 0); //Create os timers
+	vlmUpId = osTimerCreate(osTimer(debounce4), osTimerOnce, 0);
 	
+	//Initialization functions
 	initIO(); //Enable LEDs and button
 	initTim3(); //Enable Tim3 at 100Hz
 	initACC(); //Enable the accelerometer
@@ -190,11 +193,11 @@ int main (void) {
 	
 	initSPI(); //Enable SPI for wireless
 	initWireless(); //Configure the wireless module
+	
+	#if !TRANSMITTER
 	lcd_init(MODE_8_BIT); 
 	keypadInit();
-
-	
-	wirelessRead(rxWirelessInit,0x00,WIRELESS_BUFFER_INIT_SIZE);
+	#endif
 	
 	#if DEBUG
 // 		lcd_puts("I'm a stupid LCD, no... really...");
@@ -214,10 +217,12 @@ int main (void) {
 		}
 
 	#endif
+		
 	// Start threads
+	#if !TRANSMITTER
 	kThread = osThreadCreate(osThread(keypadThread), NULL);
 	lThread = osThreadCreate(osThread(lcdThread), NULL);
-	
+	#endif
 	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
 	wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
@@ -528,3 +533,8 @@ void volumeControl(void){
 void enableEXTI2(void){
 	EXTI->IMR &= ~EXTI_Line2;//DISABLE INTERUPTS ON EXTI2
 }
+
+void enableEXTI4(void){
+	EXTI->IMR &= ~EXTI_Line4;
+}
+
