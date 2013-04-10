@@ -27,7 +27,7 @@
 
 /*Defines for compilation*/
 #define DEBUG 0
-#define TRANSMITTER 1
+#define TRANSMITTER 0
 #define USE_LED_UI 1
 
 /*Defines for variables*/
@@ -334,14 +334,14 @@ void wirelessThread(void const * argument){
 				if((int8_t)rxWireless[2] >= -90 && (int8_t)rxWireless[2] <= 90)
 				{
 						osSemaphoreWait(wirelessAccId, osWaitForever);
-						wirelessAngles[0] = rxWireless[3];
+						wirelessAngles[0] = rxWireless[2];
 						osSemaphoreRelease(wirelessAccId);
 				}
 				
 				if((int8_t)rxWireless[3] >= -90 && (int8_t)rxWireless[3] <= 90)
 				{
 						osSemaphoreWait(wirelessAccId, osWaitForever);
-						wirelessAngles[1] = rxWireless[4];
+						wirelessAngles[1] = rxWireless[3];
 						osSemaphoreRelease(wirelessAccId);
 				}
 				
