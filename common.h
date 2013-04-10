@@ -62,12 +62,14 @@ extern osSemaphoreId vlmId; /**<The id for the audio volume semaphore*/
 
 extern osMutexId dmaId; /**<The id for the DMA mutex*/
 
-extern osTimerId vlmUpId; /**<The id for the audio volume up EXTI timer*/
-extern osTimerId vlmDownId; /**<The id for the audio volume down EXTI timer*/
 
 //ISR States and Flags
 extern uint8_t buttonState; /**<A variable that represents the current state of the button*/
 extern uint8_t tapState; /**<A variable that represents the current state of the tap detect*/
-extern uint8_t volumeUpBtn; /**<A variable that represents the state of the volume up button*/
-extern uint8_t volumeDownBtn; /**<A variable that represents the state of the volume down button*/
+extern uint8_t volumeBtnUp;
+extern uint8_t volumeBtnDown; /**<A variable that represents the state of the volume up/down button*/
+extern uint8_t volumeBtnUpFlag;
+extern uint8_t volumeBtnDownFlag;
+extern uint8_t volumeCounterUp;
+extern uint8_t volumeCounterDown; 
 #endif
