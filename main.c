@@ -25,13 +25,16 @@
 #include "dac.h"
 #include "isr.h"
 
-/*Defines */
+/*Defines for compilation*/
 #define DEBUG 0
+#define TRANSMITTER 0
+#define USE_LED_UI 1
+
+/*Defines for variables*/
 #define TRANSMIT_WIRELESS 0
 #define USER_BTN 0x0001 /*!<Defines the bit location of the user button*/
 #define THRESHOLD_ANGLE 10
-#define TRANSMITTER 1
-#define USE_LED_UI 0
+
 
 
 /*Global Variables*/
@@ -39,8 +42,12 @@
 //ISR States and Flags
 uint8_t buttonState = 1; 
 uint8_t tapState = 0; 
-uint8_t volumeUpBtn = 0;
-uint8_t volumeDownBtn = 0;
+uint8_t volumeBtnUp = 0;
+uint8_t volumeBtnDown = 0;
+uint8_t volumeBtnUpFlag = 0;
+uint8_t volumeBtnDownFlag = 0;
+uint8_t volumeCounterUp = 0;
+uint8_t volumeCounterDown = 0;
 
 //OS Signal Masks
 uint8_t sampleACCFlag = 0x01; /**<A flag variable for sampling, restricted to a value of 0 or 1*/
@@ -100,15 +107,6 @@ uint8_t audioVolume = 0; // Volume initially muted
 uint8_t dmaFromAccFlag = 0; /**<A flag variable that represents whether or not DMA was called from the accelerometer thread*/
 uint8_t dmaFromWirelessFlag = 0; /**<A flag variable that represents whether or not DMA was called from the wireless thread*/
 
-//Define OS timers for global variable externed in common.h
-void enableEXTI2(void);
-osTimerDef(debounce2, enableEXTI2) // Need a function for the callback to re-activate the interrupts. Need 2 functions, one for the volumeUp and another for the volumeDown.
-
-void enableEXTI4(void);
-osTimerDef(debounce4, enableEXTI4)
-
-osTimerId vlmUpId; /**<The id for the audio volume up EXTI timer*/
-osTimerId vlmDownId; /**<The id for the audio volume down EXTI timer*/
 
 //Define semaphores for global variable externed in common.h
 osSemaphoreDef(accCorrectedValues)
@@ -177,8 +175,6 @@ int main (void) {
 	//Os semaphore, thread, and mutex creation
 	accId = osSemaphoreCreate(osSemaphore(accCorrectedValues), 1); 	//Create necessary semaphores
 	dmaId = osMutexCreate(osMutex(dmaMutex)); 	//Create mutex
-	vlmDownId = osTimerCreate(osTimer(debounce2), osTimerOnce, 0); //Create os timers
-	vlmUpId = osTimerCreate(osTimer(debounce4), osTimerOnce, 0);
 	
 	//Initialization functions
 	initIO(); //Enable LEDs and button
@@ -195,8 +191,8 @@ int main (void) {
 	initWireless(); //Configure the wireless module
 	
 	#if !TRANSMITTER
-	lcd_init(MODE_8_BIT); 
-	keypadInit();
+		lcd_init(MODE_8_BIT); 
+		keypadInit();
 	#endif
 	
 	#if DEBUG
@@ -491,46 +487,7 @@ void displayPitchRoll(){
 
 void volumeControl(void){
 	uint8_t volume = 0;
-	while(1){
-		if (volumeUpBtn == 1) {
-			//Debounce volume up button on GPIOE_Pin4
-			osDelay(100);
-			while(GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_4));
-			volumeUpBtn = 0;
-			
-			//Increase the volume variable
-			getVolume(&volume);
-			//if (volume < 10) { //Change the 10 to a define called MAX_VOLUME
-				volume++;
-				setVolume(volume);
-			//}
-		}
-		
-		if (volumeDownBtn == 1) {
-			//Debouce volume down button on GPIOE_Pin2
-			osDelay(100);
-			while(GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_2));
-			volumeDownBtn = 0;
-			
-			//Decrease the volume variable
-			getVolume(&volume);
-			//if (volume > 0) { //Change the 0 to a define called MIN_VOLUME
-				volume--;
-				setVolume(volume);
-			//}
-		}
-	}
-}
-
-/**
-*@brief A function to enable interupts on EXTI2
-*@retval None
-*/
-void enableEXTI2(void){
-	EXTI->IMR &= ~EXTI_Line2;//DISABLE INTERUPTS ON EXTI2
-}
-
-void enableEXTI4(void){
-	EXTI->IMR &= ~EXTI_Line4;
+	
+	
 }
 
