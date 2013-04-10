@@ -8,6 +8,7 @@
 
 #include "isr.h"
 #include "common.h"
+#include "access.h"
 #include "stm32f4xx.h"
 
 /**Helper functions**/
@@ -63,12 +64,13 @@ void EXTI1_IRQHandler(void)
 *@retval None
 */
 
-void EXTI2_IRQHandler(void)
- {
+void EXTI2_IRQHandler(void){
 	if(EXTI_GetITStatus(EXTI_Line2) != RESET){
-		EXTI->IMR &= EXTI_Line2;//DISABLE INTERUPTS ON EXTI2
-		osTimerStart(vlmDownId, 250);//Start Timer
-		volumeDownBtn = 1;
+		
+		if(!volumeBtnDownFlag){
+			volumeBtnDown = 1 - volumeBtnDown;
+			volumeBtnDownFlag = 1;
+		}
 		EXTI_ClearITPendingBit(EXTI_Line2);	//Clear the EXTI2 interrupt flag
 	}
 }
@@ -81,9 +83,12 @@ void EXTI2_IRQHandler(void)
 void EXTI4_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line4) != RESET){
-		EXTI->IMR &= EXTI_Line4;//DISABLE INTERUPTS ON EXTI4
-		osTimerStart(vlmUpId, 250);//Start Timer
-		volumeUpBtn = 1;
+
+		if(!volumeBtnUpFlag){
+			volumeBtnUp = 1 - volumeBtnUp;
+			volumeBtnUpFlag = 1;
+		}
+
 		EXTI_ClearITPendingBit(EXTI_Line4);	//Clear the EXTI4 interrupt flag
 	}
 }
@@ -101,12 +106,25 @@ void TIM3_IRQHandler(void)
 	if(LEDCounter == 25){
 		LEDCounter = 0;
 		
-	if(orientationMatch == 1){
-		orientationMatch = 0;
-		LEDState = LEDToggle(LEDState);
+		if(orientationMatch == 1){
+			orientationMatch = 0;
+			LEDState = LEDToggle(LEDState);
+		}
 	}
+	if(volumeBtnUpFlag){
+		volumeCounterUp++;
+		if(volumeCounterUp == 50){
+			volumeCounterUp = 0;
+			volumeBtnUpFlag = 0;
+		}
 	}
-	
+	if(volumeBtnDownFlag){
+		volumeCounterDown++;
+		if(volumeCounterDown == 50){
+			volumeCounterDown = 0;
+			volumeBtnDownFlag = 0;
+		}
+	}
 	TIM_ClearITPendingBit(TIM3, TIM_IT_Update); //Clear the TIM3 interupt bit
 }
 
