@@ -21,9 +21,9 @@
 #define SMARTRF_SETTING_FIFOTHR 0x07
 #define SMARTRF_SETTING_SYNC1 0xA3
 #define SMARTRF_SETTING_SYNC0 0xD9
-#define SMARTRF_SETTING_PKTLEN 0x03	//used to be A
+#define SMARTRF_SETTING_PKTLEN 0x04	//used to be A
 #define SMARTRF_SETTING_PKTCTRL1 0x0E // Changed so that there is an appended status to the payload and address checking based on the ADDR value with broadcasting
-#define SMARTRF_SETTING_PKTCTRL0 0x05 // CRC enabled and variable packet length enabled, so packet length must be defined as the first byte of the payload (payload length doesn't include this byte)
+#define SMARTRF_SETTING_PKTCTRL0 0x04 // CRC enabled and variable packet length enabled, so packet length must be defined as the first byte of the payload (payload length doesn't include this byte)
 #define SMARTRF_SETTING_ADDR 0x10
 #define SMARTRF_SETTING_CHANNR 0x08 //Set the channel
 #define SMARTRF_SETTING_FSCTRL1 0x0C

@@ -27,7 +27,7 @@
 
 /*Defines for compilation*/
 #define DEBUG 0
-#define TRANSMITTER 0
+#define TRANSMITTER 1
 #define USE_LED_UI 1
 
 /*Defines for variables*/
@@ -42,6 +42,7 @@
 //ISR States and Flags
 uint8_t buttonState = 1; 
 uint8_t tapState = 0; 
+uint8_t remoteTapState = 0; 
 uint8_t volumeBtnUp = 0;
 uint8_t volumeBtnDown = 0;
 uint8_t volumeBtnUpFlag = 0;
@@ -330,19 +331,21 @@ void wirelessThread(void const * argument){
 				osSignalWait(dmaFlag, osWaitForever);
 				osMutexRelease(dmaId);
 				
-				if((int8_t)rxWireless[3] >= -90 && (int8_t)rxWireless[3] <= 90)
+				if((int8_t)rxWireless[2] >= -90 && (int8_t)rxWireless[2] <= 90)
 				{
 						osSemaphoreWait(wirelessAccId, osWaitForever);
 						wirelessAngles[0] = rxWireless[3];
 						osSemaphoreRelease(wirelessAccId);
 				}
 				
-				if((int8_t)rxWireless[4] >= -90 && (int8_t)rxWireless[4] <= 90)
+				if((int8_t)rxWireless[3] >= -90 && (int8_t)rxWireless[3] <= 90)
 				{
 						osSemaphoreWait(wirelessAccId, osWaitForever);
 						wirelessAngles[1] = rxWireless[4];
 						osSemaphoreRelease(wirelessAccId);
 				}
+				
+				remoteTapState = rxWireless[4];
 				
 				//Flush RX FIFO
 				strobeCommand[0] = SFRX|SINGLEBYTE_WR; //Set for receive mode
@@ -380,12 +383,19 @@ void wirelessThread(void const * argument){
  				anglesTransmit[0] = (int8_t)anglesTemp[0];
  				anglesTransmit[1] = (int8_t)anglesTemp[1];
 				
+// 				//Prepare TX buffer to transmit
+// 				txWireless[0] = TXFIFO_BURST;
+// 				txWireless[1] = SMARTRF_SETTING_PKTLEN;
+// 				txWireless[2] = SMARTRF_SETTING_ADDR;
+// 				txWireless[3] = anglesTransmit[0];
+// 				txWireless[4] = anglesTransmit[1];
+				
 				//Prepare TX buffer to transmit
 				txWireless[0] = TXFIFO_BURST;
-				txWireless[1] = SMARTRF_SETTING_PKTLEN;
-				txWireless[2] = SMARTRF_SETTING_ADDR;
-				txWireless[3] = anglesTransmit[0];
-				txWireless[4] = anglesTransmit[1];
+				txWireless[1] = SMARTRF_SETTING_ADDR;
+				txWireless[2] = anglesTransmit[0];
+				txWireless[3] = anglesTransmit[1];
+				txWireless[4] = tapState;
 				
 				//Load TX FIFO
 				SPI_DMA_Transfer(rxWireless, txWireless, 5, WIRELESS_CS_PORT, WIRELESS_CS_PIN);
