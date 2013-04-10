@@ -24,6 +24,9 @@
 #include "keypad.h"
 #include "dac.h"
 #include "isr.h"
+#include "stm32f4_discovery_audio_codec.h"
+#include "waveplayer.h"
+#include "stm32f4_discovery.h"
 
 /*Defines for compilation*/
 #define DEBUG 0

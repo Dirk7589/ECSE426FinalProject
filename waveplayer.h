@@ -24,7 +24,7 @@
 #define __WAVE_PLAYER_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+//#include "main.h"
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum

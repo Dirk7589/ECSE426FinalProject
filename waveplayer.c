@@ -20,8 +20,13 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-
+//#include "main.h"
+#include "stm32f4xx.h"
+#include "stm32f4_discovery.h"
+#include "stm32f4_discovery_audio_codec.h"
+#include "stm32f4_discovery_lis302dl.h"
+#include <stdio.h>
+#include "waveplayer.h"
 /** @addtogroup STM32F4-Discovery_Audio_Player_Recorder
 * @{
 */ 
@@ -79,8 +84,8 @@ void WavePlayBack(uint32_t AudioFreq)
   transfer complete or Half transfer interrupts callbacks. */  
   
   /* Start playing */
-  AudioPlayStart = 1;
-  RepeatState =0;
+ // AudioPlayStart = 1;
+ // RepeatState =0;
 
   /* Initialize wave player (Codec, DMA, I2C) */
   WavePlayerInit(AudioFreq);
@@ -156,18 +161,18 @@ int WavePlayerInit(uint32_t AudioFreq)
   return 0;
 }
 
-/**
-  * @brief  MEMS accelerometre management of the timeout situation.
-  * @param  None.
-  * @retval None.
-  */
-uint32_t LIS302DL_TIMEOUT_UserCallback(void)
-{
-  /* MEMS Accelerometer Timeout error occured */
-  while (1)
-  {   
-  }
-}
+// /**
+//   * @brief  MEMS accelerometre management of the timeout situation.
+//   * @param  None.
+//   * @retval None.
+//   */
+// uint32_t LIS302DL_TIMEOUT_UserCallback(void)
+// {
+//   /* MEMS Accelerometer Timeout error occured */
+//   while (1)
+//   {   
+//   }
+// }
 
 /**
 * @brief  Play wave file from internal Flash
