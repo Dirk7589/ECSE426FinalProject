@@ -64,8 +64,7 @@ static __IO uint32_t TimingDelay;
   * @retval None
 */
 
-void WavePlayBack(uint32_t AudioFreq)
-{ 
+void WavePlayBack(uint32_t AudioFreq){ 
   /* 
   Normal mode description:
   Start playing the audio file (using DMA stream) .
@@ -97,7 +96,7 @@ void WavePlayBack(uint32_t AudioFreq)
   //LED_Toggle = 6;
   
   /* Infinite loop */
-  while(1);
+  //while(1);
   /*{ 
    
     if (RepeatState == 0)
