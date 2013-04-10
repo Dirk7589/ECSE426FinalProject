@@ -10,21 +10,21 @@
 #define __LCD_H
 
 /*Hardware Defines*/
-#define GPIO_PORT_LCD GPIOD /**<Defines the GPIO port*/
-#define GPIO_CLOCK_LCD	RCC_AHB1Periph_GPIOD /**<Defines the GPIO peripheral clock*/
-#define LCD_RS GPIO_Pin_10/**<The RS pin*/
-#define LCD_RW GPIO_Pin_9/**<The RW pin*/
-#define LCD_EN GPIO_Pin_8 /**<The EN pin*/
+#define GPIO_PORT_LCD GPIOE /**<Defines the GPIO port*/
+#define GPIO_CLOCK_LCD	RCC_AHB1Periph_GPIOE /**<Defines the GPIO peripheral clock*/
+#define LCD_RS GPIO_Pin_7/**<The RS pin*/
+#define LCD_RW GPIO_Pin_6/**<The RW pin*/
+#define LCD_EN GPIO_Pin_5 /**<The EN pin*/
 
 //The data lines of the LCD should be GPI_Pin defs
-#define LCD_D0 GPIO_Pin_0
-#define LCD_D1 GPIO_Pin_1
-#define LCD_D2 GPIO_Pin_2
-#define LCD_D3 GPIO_Pin_3
-#define LCD_D4 GPIO_Pin_4
-#define LCD_D5 GPIO_Pin_5
-#define LCD_D6 GPIO_Pin_6
-#define LCD_D7 GPIO_Pin_7
+#define LCD_D0 GPIO_Pin_8
+#define LCD_D1 GPIO_Pin_9
+#define LCD_D2 GPIO_Pin_10
+#define LCD_D3 GPIO_Pin_11
+#define LCD_D4 GPIO_Pin_12
+#define LCD_D5 GPIO_Pin_13
+#define LCD_D6 GPIO_Pin_14
+#define LCD_D7 GPIO_Pin_15
 
 /*Other Defines*/
 #define MODE_4_BIT 0x002C /**<Defines the 4 bit mode for configuration*/
