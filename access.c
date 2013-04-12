@@ -97,3 +97,15 @@ void setVolume(uint8_t vlmToSet)
 	audioVolume = vlmToSet;
 	osSemaphoreRelease(vlmId);
 }
+
+void increaseVolume(){	
+	osSemaphoreWait(vlmId, osWaitForever);
+	audioVolume++;
+	osSemaphoreRelease(vlmId);
+}
+
+void decreaseVolume(){
+	osSemaphoreWait(vlmId, osWaitForever);
+	audioVolume--;
+	osSemaphoreRelease(vlmId);
+}

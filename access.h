@@ -60,6 +60,8 @@ void getVolume(uint8_t* vlmToGet);
 */
 void setVolume(uint8_t vlmToSet);
 
+void increaseVolume(void);
 
+void decreaseVolume(void);
 
 #endif
