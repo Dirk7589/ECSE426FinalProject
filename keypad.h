@@ -10,16 +10,16 @@
 #define __KEYPAD_H
 
 /*Hardware Defines*/
-#define GPIO_PORT_KEY GPIOE /**<Defines the GPIO port*/
-#define GPIO_CLOCK_KEY	RCC_AHB1Periph_GPIOE /**<Defines the GPIO peripheral clock*/
+#define GPIO_PORT_KEY GPIOD /**<Defines the GPIO port*/
+#define GPIO_CLOCK_KEY	RCC_AHB1Periph_GPIOD /**<Defines the GPIO peripheral clock*/
 
-#define ROW_0 GPIO_Pin_8
-#define ROW_1 GPIO_Pin_9
-#define ROW_2 GPIO_Pin_10
-#define ROW_3 GPIO_Pin_11
-#define COLUMN_0 GPIO_Pin_12
-#define COLUMN_1 GPIO_Pin_13
-#define COLUMN_2 GPIO_Pin_14
+#define ROW_0 GPIO_Pin_3
+#define ROW_1 GPIO_Pin_6
+#define ROW_2 GPIO_Pin_7
+#define ROW_3 GPIO_Pin_8
+#define COLUMN_0 GPIO_Pin_0
+#define COLUMN_1 GPIO_Pin_1
+#define COLUMN_2 GPIO_Pin_2
 
 /**
 *@brief Reads the value of the button being pushed
