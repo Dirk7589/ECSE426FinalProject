@@ -149,7 +149,7 @@ void lcd_putch(char);
 void lcd_strobe(void){
 	
 	GPIO_PORT_LCD->BSRRL = LCD_EN;
-	osDelay(20);
+	osDelay(1);
 	GPIO_PORT_LCD->BSRRH = LCD_EN;	
 }
 
