@@ -223,8 +223,9 @@ int main (void) {
 	#if !TRANSMITTER
 	kThread = osThreadCreate(osThread(keypadThread), NULL);
 	lThread = osThreadCreate(osThread(lcdThread), NULL);
-	#endif
 	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
+	#endif
+	
 	wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
 	#if USE_LED_UI
@@ -439,9 +440,29 @@ void wirelessThread(void const * argument){
 }
 
 void keypadThread(void const * argument){
+	uint8_t upState = 0;
+	uint8_t downState = 0;
+	uint8_t vol;
+	
 	while(1){
 		osSignalWait(readKeypadFlag, osWaitForever);
 		key = keypadRead();
+		
+		if (upState != volumeBtnUp){
+			upState = volumeBtnUp;	//if the state changes from when the if was evaluated, then a button push will be missed next time
+			getVolume(&vol);
+			if (vol < 10){
+				increaseVolume();
+			}
+		}
+		if (downState != volumeBtnDown){
+			downState = volumeBtnDown;	//if the state changes from when the if was evaluated, then a button push will be missed next time
+			getVolume(&vol);
+			if (vol > 0){
+				decreaseVolume();
+			}
+		}
+		
 	}
 }
 
