@@ -39,6 +39,7 @@
 #define LCD_CLEAR_CMD 0x01 /**<Clears the LCD*/
 #define LCD_CURSOR_ON 0x0E /**<Turns the cursor on and blink off*/
 #define LCD_CURSOR_LINE_2 40 /**<Index of the first character on the second line of the LCD*/
+#define LCD_LINE_WIDTH 16 /**<Width of the LCD display line*/
 
 /**
 *@brief Writes a byte to the LCD
