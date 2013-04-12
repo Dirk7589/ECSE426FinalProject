@@ -10,5 +10,7 @@
 
 #include "stm32f4xx.h"
 
-void play(uint16_t* audioTone, DMA_InitTypeDef DMA_InitStructure);
+void playInit(void);
+
+void play(uint16_t* audioTone);
 #endif
