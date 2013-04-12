@@ -262,6 +262,12 @@ static void     Audio_MAL_Stop(void);
  uint32_t AUDIO_MAL_DMA_FLAG_TE  = AUDIO_I2S_DMA_FLAG_TE;
  uint32_t AUDIO_MAL_DMA_FLAG_DME = AUDIO_I2S_DMA_FLAG_DME;
 
+void getDMADAC(DMA_InitTypeDef* dacStruct){
+	
+	dacStruct = &DMA_InitStructure;
+	
+}
+
 /**
   * @brief  Set the current audio interface (I2S or DAC).
   * @param  Interface: AUDIO_INTERFACE_I2S or AUDIO_INTERFACE_DAC
@@ -312,19 +318,22 @@ void EVAL_AUDIO_SetAudioInterface(uint32_t Interface)
 uint32_t EVAL_AUDIO_Init(uint16_t OutputDevice, uint8_t Volume, uint32_t AudioFreq)
 {    
   /* Perform low layer Codec initialization */
-  if (Codec_Init(OutputDevice, VOLUME_CONVERT(Volume), AudioFreq) != 0)
-  {
-    return 1;                
-  }
-  else
-  {    
-    /* I2S data transfer preparation:
-    Prepare the Media to be used for the audio transfer from memory to I2S peripheral */
-    Audio_MAL_Init();
-    
-    /* Return 0 when all operations are OK */
-    return 0;
-  }
+//   if (Codec_Init(OutputDevice, VOLUME_CONVERT(Volume), AudioFreq) != 0)
+//   {
+//     return 1;                
+//   }
+//   else
+//   {    
+//     /* I2S data transfer preparation:
+//     Prepare the Media to be used for the audio transfer from memory to I2S peripheral */
+//     Audio_MAL_Init();
+//     
+//     /* Return 0 when all operations are OK */
+//     return 0;
+//   }
+	Codec_Init(OutputDevice, VOLUME_CONVERT(Volume), AudioFreq);
+	Audio_MAL_Init();
+	return 0;
 }
 
 /**
@@ -460,6 +469,8 @@ uint32_t EVAL_AUDIO_Mute(uint32_t Cmd)
   */
 static void Audio_MAL_IRQHandler(void)
 {    
+	DMA_ClearFlag(AUDIO_MAL_DMA_STREAM, AUDIO_MAL_DMA_FLAG_TC); 
+	return;
 #ifndef AUDIO_MAL_MODE_NORMAL
   uint16_t *pAddr = (uint16_t *)CurrentPos;
   uint32_t Size = AudioRemSize;
@@ -1329,7 +1340,7 @@ static void Audio_MAL_Init(void)
 #if defined(AUDIO_MAL_DMA_IT_TC_EN) || defined(AUDIO_MAL_DMA_IT_HT_EN) || defined(AUDIO_MAL_DMA_IT_TE_EN)
   NVIC_InitTypeDef NVIC_InitStructure;
 #endif
-
+//I2S_Cmd(SPI3, ENABLE); 
   if (CurrAudioInterface == AUDIO_INTERFACE_I2S)
   {
     /* Enable the DMA clock */
