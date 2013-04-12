@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <arm_math.h>
 #include <stdio.h>
+//#include <stdlib.h>
 #include "stm32f4xx.h"
 #include "cmsis_os.h"
 #include "init.h"
@@ -29,7 +30,7 @@
 #include "stm32f4_discovery.h"
 
 /*Defines for compilation*/
-#define DEBUG 1
+#define DEBUG 0
 #define TRANSMITTER 0
 #define USE_LED_UI 1
 
@@ -42,6 +43,18 @@
 
 /*Global Variables*/
 
+/*Enumerators*/
+typedef enum {
+	NO_TONE = 0,
+	A_TONE = 1,
+	B_TONE = 2,
+	C_TONE = 3,
+	D_TONE = 4,
+	E_TONE = 5,
+	F_TONE = 6,
+	G_TONE = 7
+} tone_t;
+
 //ISR States and Flags
 uint8_t buttonState = 1; 
 uint8_t tapState = 0; 
@@ -52,6 +65,7 @@ uint8_t volumeBtnUpFlag = 0;
 uint8_t volumeBtnDownFlag = 0;
 uint8_t volumeCounterUp = 0;
 uint8_t volumeCounterDown = 0;
+tone_t keyTone = NO_TONE;
 
 //OS Signal Masks
 uint8_t sampleACCFlag = 0x01; /**<A flag variable for sampling, restricted to a value of 0 or 1*/
@@ -134,6 +148,8 @@ osMutexDef(dmaMutex)
 osMutexId dmaId;
 /*Function Prototypes*/
 
+void convertToChar(uint8_t, char *);
+
 /**
 *@brief A function that runs the display user interface
 *@retval None
@@ -157,17 +173,20 @@ void accelerometerThread(void const * argument);
 void wirelessThread(void const * argument);
 void keypadThread(void const * argument);
 void lcdThread(void const * argument);
+void dacThread(void const * argument);
 
 //Thread structure for above thread
 osThreadDef(accelerometerThread, osPriorityNormal, 1, 0);
 osThreadDef(wirelessThread, osPriorityNormal, 1, 0);
 osThreadDef(keypadThread, osPriorityNormal, 1, 0);
 osThreadDef(lcdThread, osPriorityNormal, 1, 0);
+osThreadDef(dacThread, osPriorityNormal, 1, 0);
 
 osThreadId aThread; //Accelerometer thread ID
 osThreadId wThread; //Wireless thread ID
 osThreadId kThread; //Keypad thread ID
 osThreadId lThread; //LCD thread ID
+osThreadId dThread; //DAC thread ID
 
 
 /**
@@ -224,6 +243,7 @@ int main (void) {
 	kThread = osThreadCreate(osThread(keypadThread), NULL);
 	lThread = osThreadCreate(osThread(lcdThread), NULL);
 	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
+	dThread = osThreadCreate(osThread(dacThread), NULL);
 	#endif
 	
 	wThread = osThreadCreate(osThread(wirelessThread), NULL);
@@ -446,12 +466,44 @@ void keypadThread(void const * argument){
 	
 	while(1){
 		osSignalWait(readKeypadFlag, osWaitForever);
+		//Get keypad ASCII button pressed or 'E' char if nothing pressed
 		key = keypadRead();
 		
+		//Set global tone variable with ENUM type
+		switch (key) {
+			case '1':
+				keyTone = A_TONE;
+				break;
+			case '2':
+				keyTone = B_TONE;
+				break;
+			case '3':
+				keyTone = C_TONE;
+				break;
+			case '4':
+				keyTone = D_TONE;
+				break;
+			case '5':
+				keyTone = E_TONE;
+				break;
+			case '6':
+				keyTone = F_TONE;
+				break;
+			case '7':
+				keyTone = G_TONE;
+				break;
+			case 'E':
+				break;
+			default:
+				keyTone = NO_TONE;
+				break;
+		}
+		
+		//Check if volume change needs to be done
 		if (upState != volumeBtnUp){
 			upState = volumeBtnUp;	//if the state changes from when the if was evaluated, then a button push will be missed next time
 			getVolume(&vol);
-			if (vol < 10){
+			if (vol < 101){
 				increaseVolume();
 			}
 		}
@@ -467,9 +519,82 @@ void keypadThread(void const * argument){
 }
 
 void lcdThread(void const * argument){
+	char volumeArr[LCD_LINE_WIDTH] = "VOLUME: ";
+	char tmp[3];
+	uint8_t vlmTemp = 0;
 	while(1){
 		osSignalWait(displayLCDFlag, osWaitForever);	
-		lcd_write(key);
+		
+		//Set cursor to line 1 of the LCD display
+		lcd_goto(0); 
+		switch (keyTone) {
+			case NO_TONE:
+				lcd_puts("NO TONE         "); //Padded with spaces for the width of the LCD line
+				break;
+			case A_TONE:
+				lcd_puts("PLAYING TONE: A ");
+				break;
+			case B_TONE:
+				lcd_puts("PLAYING TONE: B ");
+				break;
+			case C_TONE:
+				lcd_puts("PLAYING TONE: C ");
+				break;
+			case D_TONE:
+				lcd_puts("PLAYING TONE: D ");
+				break;
+			case E_TONE:
+				lcd_puts("PLAYING TONE: E ");
+				break;
+			case F_TONE:
+				lcd_puts("PLAYING TONE: F ");
+				break;
+			case G_TONE:
+				lcd_puts("PLAYING TONE: G ");
+				break;
+			default:
+				break;
+		}
+		//Display line 2 of the LCD
+		getVolume(&vlmTemp);
+		
+		convertToChar(vlmTemp, &volumeArr[8]);
+// 		volumeArr[8] = tmp[0];
+// 		volumeArr[9] = tmp[1];
+// 		volumeArr[10] = tmp[2];
+		lcd_goto(LCD_CURSOR_LINE_2);
+		lcd_puts(volumeArr);
+		
+	}
+}
+
+void dacThread(void const * argument){
+	while(1) {
+		
+	}
+}
+
+void convertToChar(uint8_t value, char *charValue) {
+	//char charValue[3];
+	uint8_t secondDigit = 0;
+	if (value < 100) {
+		charValue[0] = 32; //Decimal value for ASCII space character
+		if (value < 10) {
+			charValue[1] = 32; //Decimal value for ASCII space character
+			charValue[2] = value + 48; //Decimal value converted to ASCII by offset
+		} else {
+			while (value >= 10) {
+				value -= 10;
+				secondDigit++;
+			}
+			charValue[1] = secondDigit + 48;
+			charValue[2] = value + 48;
+		}
+		
+	} else {
+		charValue[0] = 49; //Decimal value for ASCII '1' character
+		charValue[1] = 48; //Decimal value for ASCII '0' character
+		charValue[2] = 48; //Decimal value for ASCII '0' character
 	}
 }
 
