@@ -285,6 +285,8 @@ void EVAL_AUDIO_Error_CallBack(void* pData);
    and re-initialize communication or in worst case reset all the application. */
 uint32_t Codec_TIMEOUT_UserCallback(void);
 
+void getDMADAC(DMA_InitTypeDef* dacStruct);
+
 #endif /* __STM32F4_DISCOVERY_AUDIOCODEC_H */
 
 /**
