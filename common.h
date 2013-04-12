@@ -35,7 +35,7 @@ extern uint16_t dTone;
 extern uint16_t eTone;
 extern uint16_t fTone;
 extern uint16_t gTone;
-
+extern uint16_t cStereo;
 
 /*********DMA Variables********/
 extern int8_t txWireless[WIRELESS_BUFFER_SIZE]; /**<Transmission buffer for Wireless for DMA*/
