@@ -35,7 +35,7 @@
 /* Private define ------------------------------------------------------------*/
  /* This is an audio file stored in the Flash memory as a constant table of 16-bit data.
     The audio format should be WAV (raw / PCM) 16-bits, Stereo (sampling rate may be modified) */
-extern uint16_t AUDIO_SAMPLE[];
+//extern uint16_t AUDIO_SAMPLE[];
 /* Audio file size and start address are defined here since the audio file is 
     stored in Flash memory as a constant table of 16-bit data */
 #define AUDIO_FILE_SZE          990000
@@ -90,7 +90,7 @@ void WavePlayBack(uint32_t AudioFreq){
   WavePlayerInit(AudioFreq);
   
   /* Play on */
-  AudioFlashPlay((uint16_t*)(AUDIO_SAMPLE + AUIDO_START_ADDRESS),AUDIO_FILE_SZE,AUIDO_START_ADDRESS);
+//  AudioFlashPlay((uint16_t*)(AUDIO_SAMPLE + AUIDO_START_ADDRESS),AUDIO_FILE_SZE,AUIDO_START_ADDRESS);
   
   /* LED Blue Start toggling */
   //LED_Toggle = 6;
@@ -213,7 +213,7 @@ void EVAL_AUDIO_TransferComplete_CallBack(uint32_t pBuffer, uint32_t Size)
   EVAL_AUDIO_Stop(CODEC_PDWN_HW);
 #else
   /* Replay from the beginning */
-  AudioFlashPlay((uint16_t*)(AUDIO_SAMPLE + AUIDO_START_ADDRESS),AUDIO_FILE_SZE,AUIDO_START_ADDRESS);
+ // AudioFlashPlay((uint16_t*)(AUDIO_SAMPLE + AUIDO_START_ADDRESS),AUDIO_FILE_SZE,AUIDO_START_ADDRESS);
 #endif  
   
 #elif defined MEDIA_USB_KEY  
