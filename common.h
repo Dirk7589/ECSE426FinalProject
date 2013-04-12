@@ -28,6 +28,14 @@ extern char key;
 extern uint8_t LEDState; /**<A variable containing the current LED state*/
 extern uint8_t orientationMatch;
 extern uint8_t LEDCounter;
+extern uint16_t aTone;
+extern uint16_t bTone;
+extern uint16_t cTone;
+extern uint16_t dTone;
+extern uint16_t eTone;
+extern uint16_t fTone;
+extern uint16_t gTone;
+
 
 /*********DMA Variables********/
 extern int8_t txWireless[WIRELESS_BUFFER_SIZE]; /**<Transmission buffer for Wireless for DMA*/
