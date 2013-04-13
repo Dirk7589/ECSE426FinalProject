@@ -30,7 +30,7 @@
 #include "stm32f4_discovery.h"
 
 /*Defines for compilation*/
-#define DEBUG 1
+#define DEBUG 0
 #define TRANSMITTER 0
 #define USE_LED_UI 1
 
@@ -119,7 +119,7 @@ uint8_t orientationMatch = 0;
 uint8_t LEDCounter = 0;
 uint8_t volumeUpBtnPressed = 0;
 uint8_t volumeDownBtnPressed = 0;
-uint8_t audioVolume = 0; // Volume initially muted
+uint8_t audioVolume = 50; // Volume initially muted
 
 
 uint8_t dmaFromAccFlag = 0; /**<A flag variable that represents whether or not DMA was called from the accelerometer thread*/
@@ -205,7 +205,7 @@ int main (void) {
 	initACC(); //Enable the accelerometer
 	initDMA(); //Enable DMA for the accelerometer
 	initEXTIButton(); //Enable button interrupts via exti0
-	
+	playInit();
 	#if TRANSMITTER
 		initEXTIACC();	//Enable tap interrupts via exti1
 	#endif
@@ -219,23 +219,25 @@ int main (void) {
 	#endif
 	
 	#if DEBUG
-// 		lcd_puts("I'm a stupid LCD, no... really...");
-// 		osDelay(2000);
-// 		lcd_goto(40);
-// 		lcd_puts("Secretly, I'm a");
-// 		osDelay(2000);
-// 		lcd_clear();
-// 		while(1);
-// 		char key = 'e';
-		playInit();
-		play(&aTone);
-		while(1){
-// 			key = keypadRead();
-// 			if (key != 'E'){
-// 				lcd_clear();
-// 				lcd_write(key);
-// 			}
-		}
+		
+	
+	while(1){
+		play(&cTone);
+		osDelay(2000);
+		adjustPitch(&cTone, 260);
+		play(newPitchBuffer1);
+		osDelay(1000);
+		adjustPitch(&cTone, 265);
+		play(newPitchBuffer1);
+		osDelay(1000);
+		adjustPitch(&cTone, 270);
+		play(newPitchBuffer1);
+		osDelay(1000);
+		adjustPitch(&cTone, 275);
+		play(newPitchBuffer1);
+		osDelay(1000);
+	}
+
 
 	#endif
 		
@@ -244,10 +246,9 @@ int main (void) {
 		kThread = osThreadCreate(osThread(keypadThread), NULL);
 		lThread = osThreadCreate(osThread(lcdThread), NULL);
 		dThread = osThreadCreate(osThread(dacThread), NULL);
-	#else
-		aThread = osThreadCreate(osThread(accelerometerThread), NULL);
 	#endif
 	
+	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
 	wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
 	#if USE_LED_UI
@@ -522,7 +523,6 @@ void keypadThread(void const * argument){
 
 void lcdThread(void const * argument){
 	char volumeArr[LCD_LINE_WIDTH] = "VOLUME: ";
-	char tmp[3];
 	uint8_t vlmTemp = 0;
 	while(1){
 		osSignalWait(displayLCDFlag, osWaitForever);	
@@ -571,37 +571,55 @@ void lcdThread(void const * argument){
 }
 
 void dacThread(void const * argument){
+	uint8_t vlm; //Variable for volume
+	getVolume(&vlm); //Get the volume
+	int8_t ang[2]; //Variable for the roll and pitch
+	uint16_t* tone;
+	int16_t baseFrequency;
 	
 	while(1) {
+		getWirelessAngles(ang); //Get the angles
+		getVolume(&vlm); //Get the volume
+		EVAL_AUDIO_VolumeCtl(vlm); //Set the volume
 		//Select which tone to play, note that the same buffer is always passed to play
 		switch (keyTone) {
 			case NO_TONE:
 				
 				break;
 			case A_TONE:
-					//play(&aTone); //Start playing the selected tone
+				tone = &aTone;
+				baseFrequency = 440;
 				break;
 			case B_TONE:
-				
+				tone = &bTone;
+				baseFrequency = 495;
 				break;
 			case C_TONE:
-				
+				tone = &cTone;
+				baseFrequency = 256;
 				break;
 			case D_TONE:
-				
+				tone = &dTone;
+				baseFrequency = 295;
 				break;
 			case E_TONE:
-				
+				tone = &eTone;
+				baseFrequency = 335;
 				break;
 			case F_TONE:
-				
+				tone = &fTone;
+				baseFrequency = 350;
 				break;
 			case G_TONE:
-				
+				tone = &gTone;
+				baseFrequency = 395;
 				break;
 			default:
 				break;
 		}
+		baseFrequency = baseFrequency + ang[0]*0.5;
+		adjustPitch(tone, baseFrequency);
+		play(newPitchBuffer1);
 	}
 }
 
@@ -676,9 +694,4 @@ void displayPitchRoll(){
 	
 }
 
-void volumeControl(void){
-	uint8_t volume = 0;
-	
-	
-}
 
