@@ -29,14 +29,7 @@ extern char key;
 extern uint8_t LEDState; /**<A variable containing the current LED state*/
 extern uint8_t orientationMatch;
 extern uint8_t LEDCounter;
-extern uint16_t aTone;
-extern uint16_t bTone;
-extern uint16_t cTone;
-extern uint16_t dTone;
-extern uint16_t eTone;
-extern uint16_t fTone;
-extern uint16_t gTone;
-extern uint16_t cStereo;
+
 
 /*********DMA Variables********/
 extern int8_t txWireless[WIRELESS_BUFFER_SIZE]; /**<Transmission buffer for Wireless for DMA*/
@@ -61,6 +54,13 @@ extern uint8_t dmaFlag; /**<A flag variable that represents the dma poll*/
 /*********DAC Variables**************/
 extern uint16_t newPitchBuffer[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
 extern uint16_t phase;
+extern uint16_t aTone;
+extern uint16_t bTone;
+extern uint16_t cTone;
+extern uint16_t dTone;
+extern uint16_t eTone;
+extern uint16_t fTone;
+extern uint16_t gTone;
 
 /******Thread Prototypes*************/
 extern osThreadId aThread; //Accelerometer thread ID
