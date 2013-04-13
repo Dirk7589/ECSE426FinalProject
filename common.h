@@ -10,6 +10,7 @@
 
 #include "cmsis_os.h"
 #include "wireless.h"
+#include "dac.h"
 
 /**Common Defines**/
 #define GREEN_LED 0x1000 /*!<Defines the bit location of the green LED*/
@@ -61,6 +62,9 @@ extern osThreadId aThread; //Accelerometer thread ID
 extern osThreadId wThread; //Wireless thread ID
 extern osThreadId kThread; //Keypad thread ID
 extern osThreadId lThread; //LCD thread ID
+
+/*********DAC Variables**************/
+extern uint16_t newPitchBuffer[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
 
 extern osSemaphoreId wirelessAccId;
 extern osSemaphoreId accId; /**<The id for the accCorrectedValues semaphore*/
