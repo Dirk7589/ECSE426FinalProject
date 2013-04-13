@@ -262,12 +262,6 @@ static void     Audio_MAL_Stop(void);
  uint32_t AUDIO_MAL_DMA_FLAG_TE  = AUDIO_I2S_DMA_FLAG_TE;
  uint32_t AUDIO_MAL_DMA_FLAG_DME = AUDIO_I2S_DMA_FLAG_DME;
 
-void getDMADAC(DMA_InitTypeDef* dacStruct){
-	
-	dacStruct = &DMA_InitStructure;
-	
-}
-
 /**
   * @brief  Set the current audio interface (I2S or DAC).
   * @param  Interface: AUDIO_INTERFACE_I2S or AUDIO_INTERFACE_DAC
