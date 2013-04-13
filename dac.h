@@ -11,7 +11,7 @@
 #include "stm32f4xx.h"
 
 #define SAMPLING_RATE 22050
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 2048
 #define INVERSE_SAMPLING_RATE 0.00004535147
 
 void playInit(void);

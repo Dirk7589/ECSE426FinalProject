@@ -12,8 +12,10 @@
 /*Global Variables*/    
 
 DMA_InitTypeDef dacStruct;
-uint16_t newPitchBuffer[BUFFER_SIZE];
+uint16_t newPitchBuffer1[BUFFER_SIZE];
+uint16_t newPitchBuffer2[BUFFER_SIZE];
 uint16_t phase;
+uint8_t audioDMAFlag = 0; //Tells you which register is avaiable
 
 void playInit(void){
 	/* Initialize I2S interface */  
@@ -41,14 +43,14 @@ void playInit(void){
 }
 
 void play(uint16_t* audioTone){
-	
+	DMA_Cmd(AUDIO_I2S_DMA_STREAM, DISABLE); //Turn on DMA
 	dacStruct.DMA_Memory0BaseAddr = (uint32_t)audioTone; //Select the tone to play
 	dacStruct.DMA_BufferSize = (uint32_t)BUFFER_SIZE; //Specify the buffer size
   /* If the I2S peripheral is still not enabled, enable it */
-  if ((CODEC_I2S->I2SCFGR & 0x0400) == 0)
-  {
-    I2S_Cmd(CODEC_I2S, ENABLE);
-  }
+	if ((CODEC_I2S->I2SCFGR & 0x0400) == 0)
+	{
+		I2S_Cmd(CODEC_I2S, ENABLE);
+	}
 	
 	/* Configure the DMA Stream with the new parameters */
 	DMA_Init(AUDIO_I2S_DMA_STREAM, &dacStruct); //Intialize it
@@ -64,6 +66,6 @@ void adjustPitch(uint16_t* sinTable, uint16_t desiredFreq) {
 	for(i = 0; i < BUFFER_SIZE; i++) {
 		phase = phase + (uint16_t)phaseShift;
 		phase = phase % BUFFER_SIZE;
-		newPitchBuffer[i] = sinTable[phase];
+		newPitchBuffer1[i] = sinTable[phase];
 	}
 }
