@@ -52,7 +52,7 @@ void play(uint16_t* audioTone){
 	
 	/* Configure the DMA Stream with the new parameters */
 	DMA_Init(AUDIO_I2S_DMA_STREAM, &dacStruct); //Intialize it
-
+	DMA_MemoryTargetConfig(AUDIO_I2S_DMA_STREAM, (uint32_t)audioTone, DMA_Memory_1);
 	/* Enable the I2S DMA Stream*/
 	DMA_Cmd(AUDIO_I2S_DMA_STREAM, ENABLE); //Turn on DMA
 }
