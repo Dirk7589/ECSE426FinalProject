@@ -30,7 +30,7 @@
 #include "stm32f4_discovery.h"
 
 /*Defines for compilation*/
-#define DEBUG 0
+#define DEBUG 1
 #define TRANSMITTER 0
 #define USE_LED_UI 1
 
@@ -227,7 +227,8 @@ int main (void) {
 // 		lcd_clear();
 // 		while(1);
 // 		char key = 'e';
-		WavePlayBack(I2S_AudioFreq_48k);
+		playInit();
+		play(&aTone);
 		while(1){
 // 			key = keypadRead();
 // 			if (key != 'E'){
