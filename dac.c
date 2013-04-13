@@ -12,6 +12,7 @@
 /*Global Variables*/    
 
 DMA_InitTypeDef dacStruct;
+uint16_t newPitchBuffer[BUFFER_SIZE];
 
 void playInit(void){
 	/* Initialize I2S interface */  
@@ -56,5 +57,15 @@ void play(uint16_t* audioTone){
   if ((CODEC_I2S->I2SCFGR & 0x0400) == 0)
   {
     I2S_Cmd(CODEC_I2S, ENABLE);
-  }	
+  }
+}
+
+void adjustPitch(uint16_t* sinTable, uint16_t desiredFreq) {
+	uint16_t i = 0;
+	uint16_t phase = 1;
+	for(i = 0; i < BUFFER_SIZE; i++) {
+		phase = phase + BUFFER_SIZE * (desiredFreq / SAMPLING_RATE);
+		phase = phase % BUFFER_SIZE;
+		newPitchBuffer[i] = sinTable[phase];
+	}
 }
