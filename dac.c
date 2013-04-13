@@ -19,7 +19,7 @@ void playInit(void){
 	/* Initialize I2S interface */  
 	EVAL_AUDIO_SetAudioInterface(AUDIO_INTERFACE_I2S);
 
-	EVAL_AUDIO_Init(OUTPUT_DEVICE_AUTO, 70, I2S_AudioFreq_22k);
+	EVAL_AUDIO_Init(OUTPUT_DEVICE_AUTO, 50, I2S_AudioFreq_22k);
 
 	dacStruct.DMA_Channel = AUDIO_I2S_DMA_CHANNEL;  
 	dacStruct.DMA_PeripheralBaseAddr = AUDIO_I2S_DMA_DREG;
