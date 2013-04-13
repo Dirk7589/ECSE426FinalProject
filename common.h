@@ -57,14 +57,17 @@ extern uint8_t readKeypadFlag; /**<A flag variable that represents the keypad po
 extern uint8_t displayLCDFlag; /**<A flag variable that represents the display poll*/
 extern uint8_t dmaFlag; /**<A flag variable that represents the dma poll*/
 
+
+/*********DAC Variables**************/
+extern uint16_t newPitchBuffer[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
+extern uint16_t phase;
+
 /******Thread Prototypes*************/
 extern osThreadId aThread; //Accelerometer thread ID
 extern osThreadId wThread; //Wireless thread ID
 extern osThreadId kThread; //Keypad thread ID
 extern osThreadId lThread; //LCD thread ID
 
-/*********DAC Variables**************/
-extern uint16_t newPitchBuffer[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
 
 extern osSemaphoreId wirelessAccId;
 extern osSemaphoreId accId; /**<The id for the accCorrectedValues semaphore*/
