@@ -60,9 +60,9 @@ void play(uint16_t* audioTone){
 void adjustPitch(uint16_t* sinTable, uint16_t desiredFreq) {
 	uint16_t i = 0;
 	
-	uint16_t phaseShift = BUFFER_SIZE * (desiredFreq * INVERSE_SAMPLING_RATE);
+	float phaseShift = BUFFER_SIZE * (desiredFreq * INVERSE_SAMPLING_RATE);
 	for(i = 0; i < BUFFER_SIZE; i++) {
-		phase = phase + phaseShift;
+		phase = phase + (uint16_t)phaseShift;
 		phase = phase % BUFFER_SIZE;
 		newPitchBuffer[i] = sinTable[phase];
 	}
