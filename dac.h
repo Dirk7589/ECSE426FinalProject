@@ -10,7 +10,12 @@
 
 #include "stm32f4xx.h"
 
+#define SAMPLING_RATE 22050
+#define BUFFER_SIZE 512
+
 void playInit(void);
 
 void play(uint16_t* audioTone);
+
+void adjustPitch(uint16_t* sinTable, uint16_t desiredFreq);
 #endif
