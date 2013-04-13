@@ -240,18 +240,19 @@ int main (void) {
 		
 	// Start threads
 	#if !TRANSMITTER
-	kThread = osThreadCreate(osThread(keypadThread), NULL);
-	lThread = osThreadCreate(osThread(lcdThread), NULL);
-	aThread = osThreadCreate(osThread(accelerometerThread), NULL);
-	dThread = osThreadCreate(osThread(dacThread), NULL);
+		kThread = osThreadCreate(osThread(keypadThread), NULL);
+		lThread = osThreadCreate(osThread(lcdThread), NULL);
+		dThread = osThreadCreate(osThread(dacThread), NULL);
+	#else
+		aThread = osThreadCreate(osThread(accelerometerThread), NULL);
 	#endif
 	
 	wThread = osThreadCreate(osThread(wirelessThread), NULL);
 
 	#if USE_LED_UI
-	displayUI(); //Main display function
+		displayUI(); //Main display function
 	#else
-	volumeControl();	
+		volumeControl();	
 	#endif
 }	
 
@@ -569,8 +570,37 @@ void lcdThread(void const * argument){
 }
 
 void dacThread(void const * argument){
+	
 	while(1) {
-		
+		//Select which tone to play, note that the same buffer is always passed to play
+		switch (keyTone) {
+			case NO_TONE:
+				
+				break;
+			case A_TONE:
+					//play(&aTone); //Start playing the selected tone
+				break;
+			case B_TONE:
+				
+				break;
+			case C_TONE:
+				
+				break;
+			case D_TONE:
+				
+				break;
+			case E_TONE:
+				
+				break;
+			case F_TONE:
+				
+				break;
+			case G_TONE:
+				
+				break;
+			default:
+				break;
+		}
 	}
 }
 
