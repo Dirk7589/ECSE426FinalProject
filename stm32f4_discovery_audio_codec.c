@@ -126,6 +126,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4_discovery_audio_codec.h"
+#include "common.h"
 
 /** @addtogroup Utilities
   * @{
@@ -465,13 +466,11 @@ static void Audio_MAL_IRQHandler(void)
 {    
 	DMA_ClearFlag(AUDIO_MAL_DMA_STREAM, AUDIO_MAL_DMA_FLAG_TC); 
 
-  /* Transfer complete interrupt */
-  if (DMA_GetFlagStatus(AUDIO_MAL_DMA_STREAM, AUDIO_MAL_DMA_FLAG_TC) != RESET)
-  {         
-		
-  }
-
-
+	/* Transfer complete interrupt */
+	if (DMA_GetFlagStatus(AUDIO_MAL_DMA_STREAM, AUDIO_MAL_DMA_FLAG_TC) != RESET)
+	{         
+		audioDMAFlag = 1 - audioDMAFlag; //Tells you which register is available
+	}
 }
 
 /**
