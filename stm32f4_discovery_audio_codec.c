@@ -474,7 +474,7 @@ static void Audio_MAL_IRQHandler(void)
   /* Transfer complete interrupt */
   if (DMA_GetFlagStatus(AUDIO_MAL_DMA_STREAM, AUDIO_MAL_DMA_FLAG_TC) != RESET)
   {         
-
+		
   }
 
 
