@@ -12,7 +12,7 @@
 
 #define SAMPLING_RATE 22050
 #define BUFFER_SIZE 512
-#define INVERSE_SAMPLING_RATE 1 / 22050
+#define INVERSE_SAMPLING_RATE 0.00004535147
 
 void playInit(void);
 
