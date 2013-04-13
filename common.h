@@ -52,7 +52,9 @@ extern uint8_t dmaFlag; /**<A flag variable that represents the dma poll*/
 
 
 /*********DAC Variables**************/
-extern uint16_t newPitchBuffer[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
+extern uint16_t newPitchBuffer1[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
+extern uint16_t newPitchBuffer2[BUFFER_SIZE]; /**<Buffer containing adjusted pitch values*/
+extern uint8_t audioDMAFlag;
 extern uint16_t phase;
 extern uint16_t aTone;
 extern uint16_t bTone;
