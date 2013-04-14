@@ -8,12 +8,15 @@
 #include "dac.h"
 #include "stm32f4_discovery_audio_codec.h"
 #include "stm32f4xx.h"
+#include <stdint.h>
+//#include <arm_math.h>
 
 /*Global Variables*/    
 
 DMA_InitTypeDef dacStruct;
 uint16_t newPitchBuffer1[BUFFER_SIZE];
-uint16_t newPitchBuffer2[BUFFER_SIZE];
+float32_t toConvolve[BUFFER_SIZE];
+float32_t convolved[BUFFER_SIZE+BUFFER_SIZE - 1];
 uint16_t phase;
 uint8_t audioDMAFlag = 0; //Tells you which register is avaiable
 
