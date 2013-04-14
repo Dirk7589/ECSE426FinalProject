@@ -10,7 +10,6 @@
 #include <stdint.h>
 #include <arm_math.h>
 #include <stdio.h>
-//#include <stdlib.h>
 #include "stm32f4xx.h"
 #include "cmsis_os.h"
 #include "init.h"
@@ -577,6 +576,9 @@ void dacThread(void const * argument){
 	uint16_t* tone;
 	int16_t baseFrequency;
 	uint16_t j;
+	float32_t* impulsePtr = &impulse;
+	float32_t* toConvolvePtr = &toConvolve[0];
+	float32_t* convolvedPtr = &convolved[0];
 	
 	while(1) {
 		getWirelessAngles(ang); //Get the angles
@@ -627,8 +629,10 @@ void dacThread(void const * argument){
 				for(j = 1; j<2048; j++){	
 					toConvolve[j] = (float32_t) tone[j];
 				}
-				//arm_conv_f32(&impulse, BUFFER_SIZE, &toConvolve, BUFFER_SIZE, &convolved);
-				
+				arm_conv_f32(impulsePtr, BUFFER_SIZE, toConvolvePtr, BUFFER_SIZE, convolvedPtr);
+				for(j = 1; j<2048; j++){
+					newPitchBuffer1[j] = (uint16_t)(convolved[j] + 32768);
+				}
 				break;
 			default:
 				break;
