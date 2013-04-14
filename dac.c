@@ -9,7 +9,7 @@
 #include "stm32f4_discovery_audio_codec.h"
 #include "stm32f4xx.h"
 #include <stdint.h>
-//#include <arm_math.h>
+#include "common.h"
 
 /*Global Variables*/    
 
