@@ -11,6 +11,9 @@
 #include "cmsis_os.h"
 #include "wireless.h"
 #include "dac.h"
+#include "stm32f4xx.h"
+#include <stdint.h>
+//#include <arm_math.h>
 
 /**Common Defines**/
 #define GREEN_LED 0x1000 /*!<Defines the bit location of the green LED*/
@@ -63,6 +66,9 @@ extern uint16_t dTone;
 extern uint16_t eTone;
 extern uint16_t fTone;
 extern uint16_t gTone;
+extern float32_t toConvolve[BUFFER_SIZE];
+extern float32_t convolved[BUFFER_SIZE+BUFFER_SIZE - 1];
+extern float32_t impulse;
 
 /******Thread Prototypes*************/
 extern osThreadId aThread; //Accelerometer thread ID
