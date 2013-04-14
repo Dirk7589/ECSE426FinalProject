@@ -576,6 +576,7 @@ void dacThread(void const * argument){
 	int8_t ang[2]; //Variable for the roll and pitch
 	uint16_t* tone;
 	int16_t baseFrequency;
+	uint16_t j;
 	
 	while(1) {
 		getWirelessAngles(ang); //Get the angles
@@ -617,7 +618,23 @@ void dacThread(void const * argument){
 			default:
 				break;
 		}
-		baseFrequency = baseFrequency + ang[0]*0.5;
+		
+		switch(remoteTapState){
+			case 0:
+				break;
+			case 1:
+				//convolve to add echo effect
+				for(j = 1; j<2048; j++){	
+					toConvolve[j] = (float32_t) tone[j];
+				}
+				//arm_conv_f32(&impulse, BUFFER_SIZE, &toConvolve, BUFFER_SIZE, &convolved);
+				
+				break;
+			default:
+				break;
+		}
+		
+		baseFrequency = baseFrequency + ang[1]*0.5;
 		adjustPitch(tone, baseFrequency);
 		play(newPitchBuffer1);
 	}
