@@ -13,13 +13,15 @@
 #include "dac.h"
 #include "stm32f4xx.h"
 #include <stdint.h>
-//#include <arm_math.h>
+
 
 /**Common Defines**/
 #define GREEN_LED 0x1000 /*!<Defines the bit location of the green LED*/
 #define ORANGE_LED 0x2000 /**< Defines the bit location of the orange LED*/
 #define RED_LED 0x4000 /**< Defines the bit location of the red LED*/
 #define BLUE_LED 0x8000	/**< Defines the bit location of the blue LED*/
+
+typedef float  float32_t;
 
 /*Global Variables*/
 extern float temperature; /**<The temperature variable*/
